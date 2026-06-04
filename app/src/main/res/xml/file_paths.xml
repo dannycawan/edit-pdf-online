@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Purpose: FileProvider path configuration for sharing PDF files
+  Caller: AndroidManifest.xml (FileProvider declaration)
+  Dependencies: None
+  Side Effects: Defines which directories can be shared via FileProvider
+-->
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Export output files in cache/exports/ -->
+    <cache-path
+        name="exports"
+        path="exports/" />
+
+    <!-- Temporary PDF files in cache/ -->
+    <cache-path
+        name="temp_pdfs"
+        path="." />
+
+    <!-- Signature files in files/signatures/ -->
+    <files-path
+        name="signatures"
+        path="signatures/" />
+</paths>

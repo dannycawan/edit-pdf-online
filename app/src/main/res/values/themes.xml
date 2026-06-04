@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Purpose: App theme definition for Edit PDF Online - Text Editor
+  Caller: AndroidManifest.xml
+  Side Effects: Sets the base Material3 theme for the app
+-->
+<resources>
+    <style name="Theme.EditPdfOnline" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">@color/primary</item>
+        <item name="android:navigationBarColor">@color/surface</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+</resources>

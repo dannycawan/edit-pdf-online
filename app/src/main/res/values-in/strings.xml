@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Purpose: Indonesian (Bahasa Indonesia) string resources for Edit PDF Online
+  Caller: Android resource system when device locale is Indonesian
+  Dependencies: values/strings.xml (base English strings)
+  Side Effects: Provides all user-facing text in Indonesian
+-->
+<resources>
+    <!-- App name stays in English -->
+    <string name="app_name">Edit PDF Online - Text Editor</string>
+
+    <!-- Home -->
+    <string name="home_title">Edit Teks PDF</string>
+    <string name="home_subtitle">Tambah, tutup, dan ganti teks di file PDF.</string>
+    <string name="main_tools">Alat Utama</string>
+    <string name="pdf_tools">Alat PDF</string>
+    <string name="recent_files">File Terbaru</string>
+    <string name="open_pdf">Buka PDF</string>
+    <string name="no_recent_files">Belum ada file terbaru</string>
+    <string name="view_all">Lihat Semua</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Beranda</string>
+    <string name="nav_files">File</string>
+    <string name="nav_tools">Alat</string>
+    <string name="nav_settings">Pengaturan</string>
+
+    <!-- Tools -->
+    <string name="tool_edit_pdf_text">Edit Teks PDF</string>
+    <string name="tool_add_text">Tambah Teks</string>
+    <string name="tool_replace_text">Ganti Teks</string>
+    <string name="tool_cover_old_text">Tutup Teks Lama</string>
+    <string name="tool_sign_pdf">Tanda Tangan PDF</string>
+    <string name="tool_fill_form">Isi Form PDF</string>
+    <string name="tool_merge_pdf">Gabung PDF</string>
+    <string name="tool_split_pdf">Pisah PDF</string>
+    <string name="tool_compress_pdf">Kompres PDF</string>
+    <string name="tool_rotate_pdf">Putar PDF</string>
+    <string name="tool_image_to_pdf">Gambar ke PDF</string>
+    <string name="tool_pdf_to_image">PDF ke Gambar</string>
+    <string name="tool_delete_pages">Hapus Halaman</string>
+    <string name="tools_convert">Konversi</string>
+    <string name="tools_subtitle_edit">Tambah, tutup, atau ganti teks</string>
+    <string name="tools_subtitle_sign">Gambar dan tempatkan tanda tangan</string>
+    <string name="tools_subtitle_fill">Isi kotak centang form</string>
+    <string name="tools_subtitle_add_text">Tambah teks baru ke PDF</string>
+    <string name="tools_processing_title">Memproses</string>
+    <string name="tools_processing_message">Sedang memproses file Anda...</string>
+    <string name="tools_page_ranges">Rentang Halaman</string>
+    <string name="tools_page_ranges_hint">Contoh: 1-3,5</string>
+    <string name="tools_pages">Halaman</string>
+    <string name="tools_pages_hint">Contoh: 1,3,5</string>
+    <string name="tools_result_title">Alat Selesai</string>
+    <string name="tools_result_files_created">%1$d file dibuat</string>
+    <string name="tools_error_select_two_pdfs">Pilih minimal dua file PDF</string>
+    <string name="tools_error_select_one_image">Pilih minimal satu gambar</string>
+    <string name="tools_error_page_ranges">Masukkan halaman seperti 1-3,5</string>
+    <string name="tools_error_pages">Masukkan halaman seperti 1,3,5</string>
+    <string name="tools_error_failed">Alat gagal dijalankan</string>
+
+    <!-- Actions -->
+    <string name="action_open_pdf">Buka PDF</string>
+    <string name="action_save_pdf">Simpan PDF</string>
+    <string name="action_share_pdf">Bagikan PDF</string>
+    <string name="action_export_pdf">Ekspor PDF</string>
+    <string name="action_cancel">Batal</string>
+    <string name="action_done">Selesai</string>
+    <string name="action_next">Lanjut</string>
+    <string name="action_back">Kembali</string>
+    <string name="action_delete">Hapus</string>
+    <string name="action_undo">Urungkan</string>
+    <string name="action_redo">Ulangi</string>
+    <string name="action_rename">Ubah Nama</string>
+    <string name="action_clear">Hapus Semua</string>
+    <string name="action_save_signature">Simpan Tanda Tangan</string>
+    <string name="action_remove">Hapus</string>
+    <string name="action_ok">OK</string>
+    <string name="action_retry">Coba Lagi</string>
+
+    <!-- Editor -->
+    <string name="editor_tap_to_add_text">Ketuk di mana saja untuk menambah teks</string>
+    <string name="editor_drag_to_move">Geser untuk memindahkan teks</string>
+    <string name="editor_cover_instruction">Gambar persegi untuk menutupi teks lama.</string>
+    <string name="editor_signature_instruction">Gambar tanda tangan lalu tempatkan di PDF.</string>
+    <string name="editor_replace_instruction">Pilih area teks lama, tutup, lalu tambahkan teks baru.</string>
+    <string name="editor_save_instruction">Simpan PDF hasil edit sebagai file baru.</string>
+    <string name="editor_page_indicator">Halaman %1$d dari %2$d</string>
+    <string name="editor_text_hint">Masukkan teks</string>
+    <string name="editor_new_text_hint">Masukkan teks baru</string>
+    <string name="editor_font_size">Ukuran Font</string>
+    <string name="editor_text_color">Warna Teks</string>
+    <string name="editor_toolbar_text">Teks</string>
+    <string name="editor_toolbar_cover">Tutup</string>
+    <string name="editor_toolbar_replace">Ganti</string>
+    <string name="editor_toolbar_sign">Tanda</string>
+    <string name="editor_toolbar_check">Centang</string>
+    <string name="editor_toolbar_undo">Urung</string>
+    <string name="editor_toolbar_save">Simpan</string>
+
+    <!-- Signature -->
+    <string name="signature_title">Gambar Tanda Tangan</string>
+    <string name="signature_clear">Hapus</string>
+    <string name="signature_save">Simpan</string>
+    <string name="signature_instruction">Gunakan jari Anda untuk menggambar tanda tangan di bawah.</string>
+
+    <!-- Export -->
+    <string name="export_title">Simpan PDF Hasil Edit</string>
+    <string name="export_filename_label">Nama File</string>
+    <string name="export_filename_hint">Masukkan nama file</string>
+    <string name="export_saving">Menyimpan PDF…</string>
+    <string name="export_location">Lokasi Simpan</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Pengaturan</string>
+    <string name="settings_about">Tentang</string>
+    <string name="settings_version">Versi</string>
+    <string name="settings_privacy_policy">Kebijakan Privasi</string>
+    <string name="settings_rate_app">Nilai Aplikasi</string>
+    <string name="settings_share_app">Bagikan Aplikasi</string>
+    <string name="settings_language">Bahasa</string>
+    <string name="settings_general">Umum</string>
+    <string name="settings_support">Dukungan</string>
+    <string name="settings_legal">Legal</string>
+    <string name="settings_theme">Tema</string>
+    <string name="settings_language_current">Bahasa Indonesia</string>
+    <string name="settings_theme_current">Terang</string>
+    <string name="settings_rate_subtitle">Nilai kami di Google Play</string>
+    <string name="settings_share_subtitle">Bagikan ke teman</string>
+    <string name="settings_help">Bantuan &amp; FAQ</string>
+    <string name="settings_help_subtitle">Dapatkan bantuan aplikasi</string>
+    <string name="settings_privacy_subtitle">Baca kebijakan privasi kami</string>
+    <string name="settings_terms">Ketentuan Layanan</string>
+    <string name="settings_terms_subtitle">Baca ketentuan kami</string>
+    <string name="settings_version_label">Versi 1.0.0</string>
+    <string name="settings_footer_version">Edit PDF Online v1.0.0</string>
+    <string name="settings_share_subject">Edit PDF Online</string>
+    <string name="settings_share_text">Coba Edit PDF Online - Text Editor!\nhttps://play.google.com/store/apps/details?id=%1$s</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_title_1">Edit Teks PDF</string>
+    <string name="onboarding_desc_1">Tambah, tutup, dan ganti teks di dokumen PDF apa pun.</string>
+    <string name="onboarding_title_2">Tanda Tangan Dokumen</string>
+    <string name="onboarding_desc_2">Gambar tanda tangan dan tempatkan di halaman PDF mana pun.</string>
+    <string name="onboarding_title_3">Simpan Secara Lokal</string>
+    <string name="onboarding_desc_3">Tidak perlu login. Semua file diedit di perangkat Anda.</string>
+    <string name="onboarding_get_started">Mulai</string>
+    <string name="onboarding_skip">Lewati</string>
+
+    <!-- Success -->
+    <string name="success_pdf_saved">PDF berhasil disimpan</string>
+    <string name="success_pdf_exported">PDF berhasil diekspor</string>
+    <string name="success_pdf_shared">PDF berhasil dibagikan</string>
+    <string name="success_pdf_merged">File PDF berhasil digabung</string>
+    <string name="success_pdf_split">PDF berhasil dipisah</string>
+    <string name="success_pdf_rotated">Halaman PDF berhasil diputar</string>
+
+    <!-- Errors -->
+    <string name="error_open_pdf">Tidak dapat membuka file PDF</string>
+    <string name="error_save_pdf">Tidak dapat menyimpan file PDF</string>
+    <string name="error_save_signature">Tidak dapat menyimpan tanda tangan. Silakan coba lagi.</string>
+    <string name="error_export_pdf">Tidak dapat mengekspor file PDF. Silakan coba lagi.</string>
+    <string name="error_password_pdf">PDF ini mungkin dilindungi kata sandi</string>
+    <string name="error_large_pdf">Ukuran file PDF terlalu besar</string>
+    <string name="error_invalid_pdf">File PDF tidak valid atau rusak</string>
+    <string name="error_share_pdf">Tidak dapat membagikan file PDF</string>
+    <string name="error_no_pages">Tidak ada halaman dalam PDF ini</string>
+    <string name="error_permission">Izin penyimpanan diperlukan</string>
+    <string name="error_no_app_share">Tidak ada aplikasi untuk membagikan file ini</string>
+    <string name="error_generic">Terjadi kesalahan. Silakan coba lagi.</string>
+</resources>

@@ -1,0 +1,310 @@
+# SYSTEM_MAP.md — Edit PDF Online - Text Editor
+> Terakhir diperbarui: 2026-06-04
+
+---
+
+## Project Summary
+
+- **Tujuan aplikasi**: Aplikasi Android untuk membuka, mengedit (teks, tanda tangan, checkmark, cover), merge, split, rotate, dan mengekspor file PDF.
+- **Tech stack utama**:
+  - **Runtime**: Android (minSdk 24, targetSdk 35, compileSdk 35)
+  - **Bahasa**: Kotlin + Jetpack Compose (Material3)
+  - **PDF Engine**: PdfBox-Android (edit/export/merge/split), Android PdfRenderer (rendering preview)
+  - **Database**: Room (SQLite) — entity `recent_files`
+  - **Storage**: DataStore Preferences (belum digunakan aktif)
+  - **Ads**: Google AdMob (banner + interstitial)
+  - **Analytics**: Firebase Analytics (stub, belum aktif)
+  - **Crash Reporting**: Firebase Crashlytics (stub, belum aktif)
+  - **Remote Config**: Firebase Remote Config (stub, lokal defaults)
+  - **Navigation**: Jetpack Navigation Compose
+  - **Image Loading**: Coil Compose
+  - **Build**: Gradle Kotlin DSL + Version Catalog (`libs.versions.toml`)
+- **Pola arsitektur**: Single-Activity + Compose Navigation, pendekatan Clean Architecture ringan (data/domain/ui layers), tanpa DI framework (manual instantiation).
+
+---
+
+## Core Logic Flow (Function-Level Flowchart)
+
+### Flow 1: Buka & Edit PDF
+```
+User tap "Open PDF" (HomeScreen)
+  -> SAF file picker (implemented via ActivityResultContracts)
+    -> AppNavigation.editorRoute(uri)
+      -> EditorScreen (diimplementasi dengan EditorViewModel)
+        -> PdfRendererManager.openPdf(uri)         // buka & render halaman
+        -> PdfRendererManager.renderPage(pageIndex) // render ke Bitmap
+        -> User menambah overlay (Text/Cover/Signature/Checkmark)
+          -> EditorState.editObjects di-update
+        -> PdfExportManager.exportPdf(sourceUri, editObjects, outputStream)
+          -> drawCoverObject / drawTextObject / drawSignatureObject / drawCheckmarkObject
+        -> ShareUtils.sharePdf(file) / save via SAF
+```
+
+### Flow 1a: Buat & Tempatkan Signature
+```
+User pilih tool Sign di EditorScreen
+  -> User tap posisi di halaman PDF
+    -> EditorViewModel.storePendingTap(...)
+    -> AppNavigation navigate ke SignatureScreen
+      -> User menggambar signature di Compose Canvas
+      -> PdfSignatureManager.saveSignature(bitmap) // PNG transparan di filesDir/signatures
+      -> SignatureScreen mengembalikan signature_path via SavedStateHandle
+    -> EditorScreen menerima signatureImagePath
+    -> EditorViewModel.placeSignatureAtPendingTap(path)
+    -> SignatureObject ditambahkan ke current page
+```
+
+### Flow 2: Merge PDF
+```
+User pilih file PDF (ToolsScreen, belum diimplementasi)
+  -> PdfMergeManager.mergePdfs(uris, outputFile)
+    -> PDFMergerUtility (PdfBox-Android)
+  -> Result<File>
+```
+
+### Flow 3: Split / Rotate / Delete Pages
+```
+User pilih file PDF + pengaturan (ToolsScreen)
+  -> PdfPageToolManager.splitPdf(sourceUri, pageRanges, outputDir)
+  -> PdfPageToolManager.rotatePages(sourceUri, pageIndices, degrees, outputFile)
+  -> PdfPageToolManager.deletePages(sourceUri, pageIndices, outputFile)
+    -> PDDocument (PdfBox-Android)
+  -> Result<File> / Result<List<File>>
+```
+
+### Flow 3a: Image/PDF Conversion
+```
+User pilih Image to PDF / PDF to Image (ToolsScreen)
+  -> SAF picker image/pdf
+    -> ToolsViewModel.imageToPdf(...) / pdfToImages(...)
+      -> PdfConversionManager.imageToPdf(...) // PdfBox PDDocument + LosslessFactory
+      -> PdfConversionManager.pdfToImages(...) // Android PdfRenderer + PNG output
+    -> Result dialog + ShareUtils.shareFiles(...)
+```
+
+### Flow 4: Recent Files
+```
+User membuka file
+  -> RecentFileRepository.addOrUpdateRecentFile(...)
+    -> RecentFileDao.getRecentFileByUri(uri) // cek existing
+    -> RecentFileDao.insertRecentFile / updateRecentFile
+  -> HomeScreen: Menampilkan daftar file (dari HomeViewModel.recentFiles)
+```
+
+### Flow 5: Interstitial Ad
+```
+Setelah export/action sukses
+  -> AdFrequencyManager.recordSuccessfulAction()
+  -> AdFrequencyManager.canShowInterstitial()
+    -> cek isInterstitialAfterExportEnabled (RemoteConfigManager)
+    -> cek actionCount >= frequency
+    -> cek elapsed >= minSeconds
+  -> InterstitialAdManager.showInterstitialIfReady(activity)
+    -> InterstitialAd.show(activity)
+```
+
+---
+
+## Clean Tree
+
+```
+edit pdf online/
+├── build.gradle.kts                       # Root build script
+├── settings.gradle.kts                    # Project settings
+├── gradle.properties                      # Gradle properties
+├── gradle/
+│   └── libs.versions.toml                 # Version catalog
+├── app/
+│   ├── build.gradle.kts                   # App module build config
+│   ├── proguard-rules.pro                 # ProGuard rules
+│   └── src/main/
+│       ├── AndroidManifest.xml            # App manifest
+│       ├── res/
+│       │   ├── values/
+│       │   │   ├── strings.xml            # String resources (EN)
+│       │   │   ├── colors.xml             # XML color definitions
+│       │   │   └── themes.xml             # XML theme (non-Compose)
+│       │   └── values-in/                 # Bahasa Indonesia strings
+│       └── java/com/editpdf/online/
+│           ├── EditPdfApplication.kt      # Application class
+│           ├── MainActivity.kt            # Single Activity host
+│           ├── ads/
+│           │   ├── AdFrequencyManager.kt  # Frequency cap logic
+│           │   ├── BannerAdView.kt        # Banner ad composable
+│           │   └── InterstitialAdManager.kt # Interstitial lifecycle
+│           ├── analytics/
+│           │   ├── AnalyticsTracker.kt    # Firebase Analytics (stub)
+│           │   └── CrashReporter.kt       # Crashlytics (stub)
+│           ├── config/
+│           │   └── RemoteConfigManager.kt # Remote Config (stub + defaults)
+│           ├── data/
+│           │   ├── local/
+│           │   │   ├── AppDatabase.kt     # Room database (singleton)
+│           │   │   └── RecentFileDao.kt   # DAO for recent_files
+│           │   ├── model/
+│           │   │   └── RecentFile.kt      # Room entity recent_files
+│           │   └── repository/
+│           │       └── RecentFileRepository.kt # CRUD wrapper
+│           ├── domain/
+│           │   └── model/
+│           │       ├── EditorState.kt     # Editor state + EditorTool enum
+│           │       └── PdfEditObject.kt   # Sealed class: Text/Cover/Signature/Checkmark
+│           ├── pdf/
+│           │   ├── PdfEditorEngine.kt     # Coordinate transform (screen <-> PDF)
+│           │   ├── PdfExportManager.kt    # Export overlay ke PDF baru
+│           │   ├── PdfMergeManager.kt     # Merge + PdfPageToolManager (split/rotate/delete)
+│           │   ├── PdfRendererManager.kt  # Android PdfRenderer wrapper
+│           │   └── PdfSignatureManager.kt # Simpan/load signature PNG
+│           ├── ui/
+│           │   ├── home/
+│           │   │   └── HomeScreen.kt      # Home screen composable
+│           │   ├── navigation/
+│           │   │   └── AppNavigation.kt   # NavHost + Routes
+│           │   ├── signature/
+│           │   │   └── SignatureScreen.kt # Canvas gambar tanda tangan + save PNG
+│           │   └── theme/
+│           │       ├── Color.kt           # Compose color tokens
+│           │       ├── Theme.kt           # MaterialTheme setup
+│           │       └── Type.kt            # Typography definitions
+│           └── utils/
+│               ├── FileUtils.kt           # SAF file utilities
+│               └── ShareUtils.kt          # Share intent utilities
+```
+
+---
+
+## Module Map (The Chapters)
+
+### Entry Points
+
+| File | Fungsi/Class Utama | Peran |
+|------|-------------------|-------|
+| `EditPdfApplication.kt` | `EditPdfApplication.onCreate()` | Inisialisasi PdfBox-Android resource loader saat app start |
+| `MainActivity.kt` | `MainActivity.onCreate()` | Single Activity host, set Compose content dengan theme + navigation |
+| `AppNavigation.kt` | `AppNavigation()`, `Routes` object | Definisi semua route & NavHost; startDestination = HOME |
+
+### UI Layer
+
+| File | Fungsi/Class Utama | Peran |
+|------|-------------------|-------|
+| `HomeScreen.kt` | `HomeScreen()`, `HeroSection()`, `MainToolsGrid()`, `PdfToolsGrid()`, `BottomNavBar()` | Layar utama: hero CTA, grid tool editing, grid tool PDF, recent files, bottom nav |
+| `SignatureScreen.kt` | `SignatureScreen()`, `SignaturePad()`, `createSignatureBitmap()` | Layar gambar tanda tangan: menangkap stroke, menyimpan PNG transparan, lalu kembali ke editor |
+| `ToolsScreen.kt` | `ToolsScreen()`, tool dialogs, result/error dialogs | UI tools V1.5: picker SAF, dialog split/rotate/delete, share hasil |
+| `ToolsViewModel.kt` | `mergePdfs()`, `splitPdf()`, `rotatePdf()`, `deletePages()`, `imageToPdf()`, `pdfToImages()` | State dan orkestrasi PDF tools, analytics stub, ad action frequency |
+| `Color.kt` | Konstanta warna (PrimaryNavy, SecondaryBlue, dll) | Token warna untuk seluruh app |
+| `Theme.kt` | `EditPdfOnlineTheme()` | Material3 light theme setup |
+| `Type.kt` | `AppTypography` | Definisi tipografi app |
+
+### PDF Engine
+
+| File | Fungsi/Class Utama | Peran |
+|------|-------------------|-------|
+| `PdfRendererManager.kt` | `openPdf()`, `renderPage()`, `closePdf()`, `getPageDimensions()` | Render PDF ke Bitmap via Android PdfRenderer; copy SAF file ke temp |
+| `PdfExportManager.kt` | `exportPdf()`, `exportToFile()`, `drawTextObject()`, `drawCoverObject()`, `drawSignatureObject()`, `drawCheckmarkObject()` | Menulis semua overlay edit ke PDF baru via PdfBox-Android |
+| `PdfEditorEngine.kt` | `screenToPdf()`, `pdfToScreen()`, `screenSizeToPdf()` | Konversi koordinat antara screen space (Compose) dan PDF space (PdfBox) |
+| `PdfMergeManager.kt` | `PdfMergeManager.mergePdfs()`, `PdfPageToolManager.splitPdf()`, `.rotatePages()`, `.deletePages()` | Tools merge, split, rotate, delete halaman PDF |
+| `PdfConversionManager.kt` | `imageToPdf()`, `pdfToImages()` | Konversi gambar ke PDF dan PDF ke PNG per halaman |
+| `PdfSignatureManager.kt` | `saveSignature()`, `loadSignature()`, `getSavedSignatures()`, `deleteSignature()` | Simpan/load bitmap tanda tangan sebagai PNG di internal storage |
+
+### Domain Models
+
+| File | Fungsi/Class Utama | Peran |
+|------|-------------------|-------|
+| `EditorState.kt` | `EditorState`, `EditorTool` enum, `UndoAction` sealed class | State editor: halaman aktif, tool aktif, overlay objects, undo/redo stack |
+| `PdfEditObject.kt` | `PdfEditObject` sealed class: `TextObject`, `CoverObject`, `SignatureObject`, `CheckmarkObject` | Model overlay editing yang ditempatkan di atas halaman PDF |
+
+### Data Layer
+
+| File | Fungsi/Class Utama | Peran |
+|------|-------------------|-------|
+| `AppDatabase.kt` | `AppDatabase` (Room, singleton) | Database Room `edit_pdf_online.db`, menyediakan DAO |
+| `RecentFileDao.kt` | `getAllRecentFiles()`, `getRecentFiles()`, `insertRecentFile()`, `updateRecentFile()`, `deleteRecentFile()` | DAO CRUD untuk tabel `recent_files` |
+| `RecentFile.kt` | `RecentFile` data class (Room Entity) | Entity: id, fileName, fileUri, fileSizeBytes, pageCount, lastOpenedTime, thumbnailPath, isExported |
+| `RecentFileRepository.kt` | `addOrUpdateRecentFile()`, `markAsExported()`, `deleteRecentFile()` | Repository wrapper — cek existing by URI, insert/update |
+
+### Ads & Monetisasi
+
+| File | Fungsi/Class Utama | Peran |
+|------|-------------------|-------|
+| `BannerAdView.kt` | `BannerAdView()` composable, `TEST_BANNER_AD_UNIT_ID`, `TEST_INTERSTITIAL_AD_UNIT_ID` | Banner ad wrapper untuk Compose via AndroidView |
+| `InterstitialAdManager.kt` | `loadInterstitial()`, `showInterstitialIfReady()` | Lifecycle load/show interstitial dengan frequency cap |
+| `AdFrequencyManager.kt` | `canShowInterstitial()`, `recordSuccessfulAction()`, `recordInterstitialShown()` | Frequency cap: setiap N aksi + minimum M detik antar interstitial |
+
+### Config & Analytics
+
+| File | Fungsi/Class Utama | Peran |
+|------|-------------------|-------|
+| `RemoteConfigManager.kt` | `fetchConfig()`, property getters (isBannerHomeEnabled, interstitialFrequency, dll) | Remote Config stub dengan default values lokal; kontrol fitur & ads |
+| `AnalyticsTracker.kt` | `trackOpenPdfClicked()`, `trackExportSuccess()`, `trackToolUsed()`, dll | Firebase Analytics stub — semua event di-log ke Logcat |
+| `CrashReporter.kt` | `logError()`, `logMessage()`, `setCustomKey()` | Crashlytics stub — log ke Logcat |
+
+### Utilities
+
+| File | Fungsi/Class Utama | Peran |
+|------|-------------------|-------|
+| `FileUtils.kt` | `getFileName()`, `getFileSize()`, `generateOutputFileName()`, `createTempOutputFile()`, `isPdfFile()`, `isFileTooLarge()` | Utility SAF file operations |
+| `ShareUtils.kt` | `sharePdf()`, `sharePdfUri()` | Share PDF via Android Intent/FileProvider |
+
+---
+
+## Data & Config
+
+### Config Locations
+- **Version catalog**: `gradle/libs.versions.toml`
+- **App build config**: `app/build.gradle.kts` (namespace = `com.editpdf.online`)
+- **String resources**: `app/src/main/res/values/strings.xml` (EN), `app/src/main/res/values-in/` (ID)
+- **Colors XML**: `app/src/main/res/values/colors.xml`
+- **Remote Config defaults**: hardcoded di `RemoteConfigManager.kt` (defaults map)
+- **AdMob App ID**: `AndroidManifest.xml` meta-data (test ID: `ca-app-pub-3940256099942544~3347511713`)
+
+### Skema Data
+- **Database**: `edit_pdf_online.db` (Room, version 1)
+- **Tabel `recent_files`**:
+  | Kolom | Tipe | Keterangan |
+  |-------|------|------------|
+  | id | String (PK) | UUID |
+  | fileName | String | Nama file display |
+  | fileUri | String | SAF URI |
+  | fileSizeBytes | Long | Ukuran file |
+  | pageCount | Int | Jumlah halaman |
+  | lastOpenedTime | Long | Timestamp terakhir dibuka |
+  | lastExportedTime | Long? | Timestamp terakhir diekspor |
+  | thumbnailPath | String? | Path thumbnail (belum digunakan) |
+  | isExported | Boolean | Flag sudah pernah diekspor |
+
+### Migration/Seed
+- Tidak ada migration file eksplisit; menggunakan `fallbackToDestructiveMigration()`.
+
+### Folder Output/Runtime Artifacts
+- **Temp PDF files**: `context.cacheDir/temp_pdf_*.pdf` (PdfRendererManager)
+- **Export output**: `context.cacheDir/exports/` (FileUtils.createTempOutputFile)
+- **PDF tools output**: `context.cacheDir/pdf_tools/` (merge/split/rotate/delete/convert output)
+- **Signatures**: `context.filesDir/signatures/*.png` (PdfSignatureManager)
+
+---
+
+## External Integrations
+
+| Service | Modul Pemanggil | Status |
+|---------|----------------|--------|
+| Google AdMob (Banner) | `BannerAdView.kt` | Aktif (test IDs) |
+| Google AdMob (Interstitial) | `InterstitialAdManager.kt` | Aktif (test IDs) |
+| Firebase Analytics | `AnalyticsTracker.kt` | Stub (log ke Logcat) |
+| Firebase Crashlytics | `CrashReporter.kt` | Stub (log ke Logcat) |
+| Firebase Remote Config | `RemoteConfigManager.kt` | Stub (local defaults) |
+| PdfBox-Android | `PdfExportManager.kt`, `PdfMergeManager.kt` | Aktif |
+| Android PdfRenderer | `PdfRendererManager.kt` | Aktif |
+| Android SAF (Storage Access Framework) | `FileUtils.kt`, semua PDF managers | Aktif |
+| FileProvider | `ShareUtils.kt`, `AndroidManifest.xml`, `file_paths.xml` | Aktif untuk share exported PDF |
+
+---
+
+## Risks / Blind Spots
+
+1. **Firebase belum dikonfigurasi** — semua Firebase dependencies di-comment; `google-services.json` belum ada.
+2. **Disk Space saat Build** — Terjadi pada 2026-06-04 saat `:app:assembleDebug` di task `:app:mergeDebugGlobalSynthetics`; error `There is not enough space on the disk` di `C:\Users\User\.gradle\caches`. Bersihkan/pindahkan Gradle cache sebelum build APK.
+3. **DataStore Preferences** ada di dependency tapi belum digunakan secara aktif (saat ini Room yang dipakai untuk recent files).
+4. **Coil Compose** ada di dependency tapi belum digunakan (disiapkan untuk load signature PNG).
+5. **ProGuard rules** hanya komentar default — belum ada rules untuk PdfBox-Android atau AdMob.
+6. **Runtime QA PDF Tools** belum bisa dilakukan karena APK build masih blocked oleh disk penuh.
+7. **Launcher icon** saat ini memakai vector sederhana `@drawable/ic_launcher`; aset produksi final belum dibuat.
