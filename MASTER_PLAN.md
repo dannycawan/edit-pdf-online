@@ -134,6 +134,7 @@ Dokumen ini adalah acuan utama (master plan) pengembangan aplikasi berdasarkan *
 - [x] Interstitial only after successful tool completion and frequency cap.
 
 ## Milestone 15: Final Polish 🔄 (In Progress)
+- [x] Build debug APK and release AAB on GitHub Actions.
 - [x] Improve UI spacing (tools UI updated).
 - [x] Improve error messages (tools flow messages added/localized).
 - [x] Test localization (new tools strings added EN/ID; runtime test blocked by build disk space).

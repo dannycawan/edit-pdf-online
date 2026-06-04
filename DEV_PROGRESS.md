@@ -13,7 +13,8 @@ Melanjutkan setelah update dokumentasi `MASTER_PLAN.md`, `SYSTEM_MAP.md`, dan `D
 - **Editor UI & Logic (Milestone 2-8)**: Selesai. Pengguna bisa membuka PDF, menambah overlay teks, blok penutup (cover), mengganti teks, membuat checkmark, dan menyimpannya (export via PdfBox). 
 - **Layar Dukungan**: `HomeScreen`, `RecentFilesScreen`, `ToolsScreen`, dan `SettingsScreen` sudah diimplementasikan beserta ViewModel (Recent files menggunakan Room Database).
 - **Navigation**: Seluruh rute sudah terhubung (`AppNavigation.kt`) menggunakan Compose Navigation dan SAF Picker terintegrasi.
-- **Masalah Utama**: `:app:compileDebugKotlin` sempat berhasil, tetapi validasi terbaru tidak bisa start karena disk penuh di Gradle cache. `:app:assembleDebug` juga gagal saat D8/dexing karena disk penuh di `C:\Users\User\.gradle\caches`.
+- **Masalah Utama Lokal**: Validasi lokal masih blocked karena disk penuh di Gradle cache `C:\Users\User\.gradle\caches`.
+- **GitHub Build**: GitHub Actions `Android Build` run `26954760090` berhasil pada branch `codex/build-validation`; debug APK dan release AAB sudah dibuat sebagai artifacts.
 - **Blocked Eksternal**: Firebase real setup membutuhkan `google-services.json`; AdMob production test membutuhkan production ad unit/app IDs.
 
 ## What Has Been Confirmed
@@ -39,13 +40,13 @@ Melanjutkan setelah update dokumentasi `MASTER_PLAN.md`, `SYSTEM_MAP.md`, dan `D
 
 ## In Progress
 
-- Menunggu ruang disk C: untuk validasi build APK penuh; sisa pekerjaan real Firebase/AdMob membutuhkan file/ID eksternal.
+- Build APK/AAB sudah sukses di GitHub Actions. Lokal masih menunggu ruang disk C:; sisa pekerjaan real Firebase/AdMob membutuhkan file/ID eksternal.
 
 ## Next Exact Steps
 
 Berikut adalah milestone berikutnya berdasarkan kondisi saat ini:
 
-1. **Free Disk Space**: Kosongkan ruang di drive C: atau pindahkan Gradle cache agar `:app:assembleDebug` bisa menyelesaikan D8/dexing dan membuat APK.
+1. **Free Disk Space Lokal**: Kosongkan ruang di drive C: atau pindahkan Gradle cache agar build lokal bisa jalan lagi.
 2. **Milestone 12: Firebase Setup (external config needed)**
    - Tambahkan file `google-services.json`.
    - Uncomment kode dependency di build.gradle.
@@ -138,14 +139,15 @@ Berikut adalah milestone berikutnya berdasarkan kondisi saat ini:
 
 ## Errors / Blockers
 
-- Tidak ada blocker kode yang terkonfirmasi, tetapi validasi Gradle terbaru blocked oleh disk penuh.
+- Tidak ada blocker kode yang terkonfirmasi setelah GitHub Actions berhasil.
+- Validasi Gradle lokal tetap blocked oleh disk penuh.
 - `:app:compileDebugKotlin` terbaru tidak bisa start karena Gradle gagal membuat virtual file system: `There is not enough space on the disk`.
 - `:app:assembleDebug` gagal pada task `:app:mergeDebugGlobalSynthetics` karena `There is not enough space on the disk` saat transform/dex dependency di Gradle cache.
 - Percobaan memakai `GRADLE_USER_HOME` di workspace gagal saat unzip Gradle distribution (`NoSuchFileException` pada zip hasil download) dan meninggalkan folder sementara `.gradle-user-home/`.
 
 ## Validation Status
 
-- **Build**: `:app:compileDebugKotlin` sempat passed pada 2026-06-04 sebelum Milestone 14 tools ditambahkan. Setelah perubahan tools, compile/build belum bisa divalidasi karena disk penuh di Gradle cache (`C:\Users\User\.gradle\caches`). `:app:assembleDebug` failed karena disk penuh; belum menghasilkan APK.
+- **Build**: GitHub Actions `Android Build` run `26954760090` passed. Step `Build debug APK`, `Build release AAB`, `Upload APK`, dan `Upload AAB` semuanya success. Lokal masih gagal karena disk penuh.
 - **Test**: Not run (tidak ada test files ditemukan)
 - **Lint**: Not run
 - **Manual Check**: Passed — seluruh source code telah dibaca dan diverifikasi konsistensinya
@@ -157,4 +159,4 @@ Berikut adalah milestone berikutnya berdasarkan kondisi saat ini:
 
 ## Resume Note for Next Agent
 
-Aplikasi sudah berhasil menyelesaikan kerangka utamanya (Milestone 1-8 dan 11), plus Milestone 9 Signature, Milestone 10 analytics stub, dan Milestone 14 PDF Tools V1.5 secara implementasi. `SignatureScreen` sudah aktif. `ToolsScreen` sekarang menjalankan merge/split/rotate/delete/image-to-pdf/pdf-to-image. Build terbaru belum bisa divalidasi karena disk penuh di Gradle cache; APK belum terbentuk. Lanjut berikutnya: kosongkan ruang drive C:/pindahkan Gradle cache dengan benar, ulang compile/build, lalu lanjut real Firebase/AdMob jika file/ID tersedia.
+Aplikasi sudah berhasil menyelesaikan kerangka utamanya (Milestone 1-8 dan 11), plus Milestone 9 Signature, Milestone 10 analytics stub, dan Milestone 14 PDF Tools V1.5 secara implementasi. `SignatureScreen` sudah aktif. `ToolsScreen` sekarang menjalankan merge/split/rotate/delete/image-to-pdf/pdf-to-image. GitHub Actions berhasil membuat debug APK dan release AAB pada run `26954760090`. Lokal masih blocked oleh disk penuh. Lanjut berikutnya: kosongkan ruang drive C:/pindahkan Gradle cache dengan benar untuk build lokal, lalu lanjut real Firebase/AdMob jika file/ID tersedia.
