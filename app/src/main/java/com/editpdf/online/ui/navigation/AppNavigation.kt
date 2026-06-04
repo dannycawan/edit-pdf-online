@@ -7,6 +7,8 @@
  */
 package com.editpdf.online.ui.navigation
 
+import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -14,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -47,6 +50,7 @@ object Routes {
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
+    val context = LocalContext.current
 
     // Shared HomeViewModel for Home and RecentFiles screens
     val homeViewModel: HomeViewModel = viewModel()
@@ -61,6 +65,7 @@ fun AppNavigation() {
                 contract = ActivityResultContracts.OpenDocument()
             ) { uri: Uri? ->
                 uri?.let {
+                    persistReadPermission(context, it)
                     navController.navigate(Routes.editorRoute(it.toString()))
                 }
             }
@@ -137,6 +142,7 @@ fun AppNavigation() {
                 contract = ActivityResultContracts.OpenDocument()
             ) { uri: Uri? ->
                 uri?.let {
+                    persistReadPermission(context, it)
                     navController.navigate(Routes.editorRoute(it.toString()))
                 }
             }
@@ -163,5 +169,16 @@ fun AppNavigation() {
         composable(Routes.ONBOARDING) {
             // OnboardingScreen - optional, low priority
         }
+    }
+}
+
+private fun persistReadPermission(context: Context, uri: Uri) {
+    try {
+        context.contentResolver.takePersistableUriPermission(
+            uri,
+            Intent.FLAG_GRANT_READ_URI_PERMISSION
+        )
+    } catch (_: SecurityException) {
+        // Some providers grant only one-shot access; immediate editor opening still works.
     }
 }

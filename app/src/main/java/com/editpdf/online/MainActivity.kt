@@ -7,6 +7,7 @@
  */
 package com.editpdf.online
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -16,8 +17,13 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.editpdf.online.ui.navigation.AppNavigation
 import com.editpdf.online.ui.theme.EditPdfOnlineTheme
+import com.editpdf.online.utils.LocaleUtils
 
 class MainActivity : ComponentActivity() {
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleUtils.forceEnglish(newBase))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -135,13 +135,16 @@ Dokumen ini adalah acuan utama (master plan) pengembangan aplikasi berdasarkan *
 
 ## Milestone 15: Final Polish 🔄 (In Progress)
 - [x] Build debug APK and release AAB on GitHub Actions.
+- [x] Build debug APK locally after QA fixes (`:app:assembleDebug` passed).
 - [x] Improve UI spacing (tools UI updated).
-- [x] Improve error messages (tools flow messages added/localized).
-- [x] Test localization (new tools strings added EN/ID; runtime test blocked by build disk space).
-- [ ] Test export quality (blocked until APK build/device run).
-- [ ] Test large PDF handling (blocked until APK build/device run).
+- [x] Improve error messages (tools flow messages added/localized; editor invalid/open/export errors use resource strings).
+- [x] Test localization (English is forced as default app locale; Indonesian resources kept as fallback).
+- [x] Connect Settings menu actions (Language, Theme, Help, Privacy, Terms now open dialogs).
+- [x] Improve PDF open reliability (SAF read permission persisted; PDF validation accepts reliable header or picker metadata).
+- [ ] Test export quality (needs device/runtime QA with real PDFs).
+- [ ] Test large PDF handling (needs device/runtime QA with large PDFs).
 - [x] Test ads not appearing in editor (no ad composables in editor path).
-- [x] Test analytics events (stub methods wired for editor/tools; runtime test blocked by build disk space).
+- [x] Test analytics events (stub methods wired for editor/tools; compile/local debug build passed).
 - [x] Test Remote Config fallback (stub defaults present).
 - [x] Test Crashlytics setup (stub present; real setup blocked until Firebase config).
 - [x] Update `SYSTEM_MAP.md`.

@@ -17,11 +17,13 @@ import java.util.Locale
 
 object FileUtils {
 
+    private val PDF_HEADER = byteArrayOf(0x25, 0x50, 0x44, 0x46, 0x2D)
+
     /**
      * Gets the display name of a file from its URI.
      */
     fun getFileName(context: Context, uri: Uri): String {
-        var name = "document.pdf"
+        var name = "document"
         try {
             context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
                 if (cursor.moveToFirst()) {
@@ -83,14 +85,31 @@ object FileUtils {
     }
 
     /**
-     * Checks if a file is likely a valid PDF by checking the header.
+     * Checks if a file is likely a PDF.
+     *
+     * SAF providers do not always expose streams in a way that makes a single read reliable,
+     * so we accept either a PDF header or trusted picker metadata and let PdfRenderer do
+     * the final validation when opening the document.
      */
     fun isPdfFile(context: Context, uri: Uri): Boolean {
+        val mimeType = context.contentResolver.getType(uri)
+        val hasPdfMetadata = mimeType.equals("application/pdf", ignoreCase = true) ||
+            getFileName(context, uri).endsWith(".pdf", ignoreCase = true)
+
+        return hasPdfHeader(context, uri) || hasPdfMetadata
+    }
+
+    private fun hasPdfHeader(context: Context, uri: Uri): Boolean {
         return try {
             context.contentResolver.openInputStream(uri)?.use { input ->
-                val header = ByteArray(5)
-                input.read(header)
-                String(header) == "%PDF-"
+                val header = ByteArray(PDF_HEADER.size)
+                var offset = 0
+                while (offset < header.size) {
+                    val bytesRead = input.read(header, offset, header.size - offset)
+                    if (bytesRead == -1) break
+                    offset += bytesRead
+                }
+                offset == PDF_HEADER.size && header.contentEquals(PDF_HEADER)
             } ?: false
         } catch (_: Exception) {
             false

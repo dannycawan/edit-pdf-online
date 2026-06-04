@@ -7,6 +7,8 @@
  */
 package com.editpdf.online.ui.tools
 
+import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -50,11 +52,17 @@ fun ToolsScreen(
 
     val mergePicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenMultipleDocuments()
-    ) { uris: List<Uri> -> viewModel.mergePdfs(uris) }
+    ) { uris: List<Uri> ->
+        uris.forEach { persistReadPermission(context, it) }
+        viewModel.mergePdfs(uris)
+    }
 
     val imagePicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenMultipleDocuments()
-    ) { uris: List<Uri> -> viewModel.imageToPdf(uris) }
+    ) { uris: List<Uri> ->
+        uris.forEach { persistReadPermission(context, it) }
+        viewModel.imageToPdf(uris)
+    }
 
     val singlePdfPicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument()
@@ -62,6 +70,7 @@ fun ToolsScreen(
         val tool = pendingTool
         pendingTool = null
         if (uri != null && tool != null) {
+            persistReadPermission(context, uri)
             if (tool == "pdf_to_image") {
                 viewModel.pdfToImages(uri)
             } else {
@@ -610,4 +619,15 @@ private fun ErrorDialog(
             }
         }
     )
+}
+
+private fun persistReadPermission(context: Context, uri: Uri) {
+    try {
+        context.contentResolver.takePersistableUriPermission(
+            uri,
+            Intent.FLAG_GRANT_READ_URI_PERMISSION
+        )
+    } catch (_: SecurityException) {
+        // Some providers grant only temporary access, which is enough for immediate processing.
+    }
 }

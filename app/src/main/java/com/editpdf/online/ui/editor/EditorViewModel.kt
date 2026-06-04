@@ -12,6 +12,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.editpdf.online.R
 import com.editpdf.online.analytics.AnalyticsTracker
 import com.editpdf.online.data.repository.RecentFileRepository
 import com.editpdf.online.domain.model.EditorState
@@ -68,12 +69,12 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
 
             // Check file validity
             if (!FileUtils.isPdfFile(context, uri)) {
-                _state.update { it.copy(isLoading = false, errorMessage = "Invalid PDF file") }
+                _state.update { it.copy(isLoading = false, errorMessage = context.getString(R.string.error_invalid_pdf)) }
                 return@launch
             }
 
             if (FileUtils.isFileTooLarge(context, uri)) {
-                _state.update { it.copy(isLoading = false, errorMessage = "PDF file is too large (max 50MB)") }
+                _state.update { it.copy(isLoading = false, errorMessage = context.getString(R.string.error_large_pdf)) }
                 return@launch
             }
 
@@ -106,7 +107,7 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
                     _state.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = error.message ?: "Unable to open PDF"
+                            errorMessage = error.message ?: context.getString(R.string.error_open_pdf)
                         )
                     }
                 }
@@ -569,7 +570,7 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
                         it.copy(
                             isExporting = false,
                             exportSuccess = false,
-                            errorMessage = error.message ?: "Export failed"
+                            errorMessage = error.message ?: context.getString(R.string.error_export_pdf)
                         )
                     }
                 }
@@ -588,7 +589,7 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
             val outputStream = context.contentResolver.openOutputStream(outputUri)
 
             if (outputStream == null) {
-                _state.update { it.copy(isExporting = false, errorMessage = "Cannot write to selected location") }
+                _state.update { it.copy(isExporting = false, errorMessage = context.getString(R.string.error_save_pdf)) }
                 return@launch
             }
 
@@ -608,7 +609,11 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
                 },
                 onFailure = { error ->
                     _state.update {
-                        it.copy(isExporting = false, exportSuccess = false, errorMessage = error.message)
+                        it.copy(
+                            isExporting = false,
+                            exportSuccess = false,
+                            errorMessage = error.message ?: context.getString(R.string.error_export_pdf)
+                        )
                     }
                 }
             )

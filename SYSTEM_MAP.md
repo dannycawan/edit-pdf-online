@@ -56,7 +56,7 @@ User pilih tool Sign di EditorScreen
 
 ### Flow 2: Merge PDF
 ```
-User pilih file PDF (ToolsScreen, belum diimplementasi)
+User pilih file PDF (ToolsScreen SAF picker)
   -> PdfMergeManager.mergePdfs(uris, outputFile)
     -> PDFMergerUtility (PdfBox-Android)
   -> Result<File>
@@ -179,8 +179,8 @@ edit pdf online/
 
 | File | Fungsi/Class Utama | Peran |
 |------|-------------------|-------|
-| `EditPdfApplication.kt` | `EditPdfApplication.onCreate()` | Inisialisasi PdfBox-Android resource loader saat app start |
-| `MainActivity.kt` | `MainActivity.onCreate()` | Single Activity host, set Compose content dengan theme + navigation |
+| `EditPdfApplication.kt` | `EditPdfApplication.attachBaseContext()`, `EditPdfApplication.onCreate()` | Force default English locale dan inisialisasi PdfBox-Android resource loader saat app start |
+| `MainActivity.kt` | `MainActivity.attachBaseContext()`, `MainActivity.onCreate()` | Force default English locale, lalu host Compose content dengan theme + navigation |
 | `AppNavigation.kt` | `AppNavigation()`, `Routes` object | Definisi semua route & NavHost; startDestination = HOME |
 
 ### UI Layer
@@ -242,7 +242,8 @@ edit pdf online/
 
 | File | Fungsi/Class Utama | Peran |
 |------|-------------------|-------|
-| `FileUtils.kt` | `getFileName()`, `getFileSize()`, `generateOutputFileName()`, `createTempOutputFile()`, `isPdfFile()`, `isFileTooLarge()` | Utility SAF file operations |
+| `FileUtils.kt` | `getFileName()`, `getFileSize()`, `generateOutputFileName()`, `createTempOutputFile()`, `isPdfFile()`, `isFileTooLarge()` | Utility SAF file operations; validasi PDF memakai header atau metadata picker |
+| `LocaleUtils.kt` | `forceEnglish()` | Memaksa default runtime locale aplikasi ke English |
 | `ShareUtils.kt` | `sharePdf()`, `sharePdfUri()` | Share PDF via Android Intent/FileProvider |
 
 ---
@@ -302,9 +303,9 @@ edit pdf online/
 ## Risks / Blind Spots
 
 1. **Firebase belum dikonfigurasi** — semua Firebase dependencies di-comment; `google-services.json` belum ada.
-2. **Disk Space saat Build** — Terjadi pada 2026-06-04 saat `:app:assembleDebug` di task `:app:mergeDebugGlobalSynthetics`; error `There is not enough space on the disk` di `C:\Users\User\.gradle\caches`. Bersihkan/pindahkan Gradle cache sebelum build APK.
+2. **Local Android SDK warning** — `:app:assembleDebug` sudah berhasil pada 2026-06-04, tetapi Gradle masih mencetak warning NDK `source.properties` hilang di `C:\Users\User\AppData\Local\Android\Sdk\ndk\27.0.12077973`.
 3. **DataStore Preferences** ada di dependency tapi belum digunakan secara aktif (saat ini Room yang dipakai untuk recent files).
 4. **Coil Compose** ada di dependency tapi belum digunakan (disiapkan untuk load signature PNG).
 5. **ProGuard rules** hanya komentar default — belum ada rules untuk PdfBox-Android atau AdMob.
-6. **Runtime QA PDF Tools** belum bisa dilakukan karena APK build masih blocked oleh disk penuh.
+6. **Runtime QA PDF Tools** masih perlu dicoba di perangkat dengan PDF nyata untuk export quality, large PDF, dan file password-protected.
 7. **Launcher icon** saat ini memakai vector sederhana `@drawable/ic_launcher`; aset produksi final belum dibuat.

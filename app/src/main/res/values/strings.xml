@@ -107,7 +107,7 @@
     <string name="export_title">Save Edited PDF</string>
     <string name="export_filename_label">File Name</string>
     <string name="export_filename_hint">Enter file name</string>
-    <string name="export_saving">Saving PDF…</string>
+    <string name="export_saving">Saving PDF...</string>
     <string name="export_location">Save Location</string>
 
     <!-- Settings -->
@@ -135,6 +135,16 @@
     <string name="settings_footer_version">Edit PDF Online v1.0.0</string>
     <string name="settings_share_subject">Edit PDF Online</string>
     <string name="settings_share_text">Check out Edit PDF Online - Text Editor!\nhttps://play.google.com/store/apps/details?id=%1$s</string>
+    <string name="settings_language_dialog_title">Language</string>
+    <string name="settings_language_dialog_message">English is the default app language. Android previously showed Indonesian because the device locale matched the Indonesian resource folder.</string>
+    <string name="settings_theme_dialog_title">Theme</string>
+    <string name="settings_theme_dialog_message">Light theme is active. Dark theme will be added after the editor and PDF tools are fully stabilized.</string>
+    <string name="settings_help_dialog_title">Help &amp; FAQ</string>
+    <string name="settings_help_dialog_message">Open a PDF, choose a tool, make edits on the page, then save or share the exported file. For merge, split, rotate, delete, and conversion tools, choose the files first and follow the dialog.</string>
+    <string name="settings_privacy_dialog_title">Privacy Policy</string>
+    <string name="settings_privacy_dialog_message">Files are processed locally on your device. The app does not upload your PDFs for editing, merging, splitting, rotating, deleting pages, or conversion.</string>
+    <string name="settings_terms_dialog_title">Terms of Service</string>
+    <string name="settings_terms_dialog_message">Use this app only with documents you own or are allowed to edit. Keep a backup of important files before exporting changes.</string>
 
     <!-- Onboarding -->
     <string name="onboarding_title_1">Edit PDF Text</string>

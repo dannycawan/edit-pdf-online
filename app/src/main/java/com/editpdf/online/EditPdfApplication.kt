@@ -8,9 +8,15 @@
 package com.editpdf.online
 
 import android.app.Application
+import android.content.Context
+import com.editpdf.online.utils.LocaleUtils
 import com.tom_roush.pdfbox.android.PDFBoxResourceLoader
 
 class EditPdfApplication : Application() {
+
+    override fun attachBaseContext(base: Context) {
+        super.attachBaseContext(LocaleUtils.forceEnglish(base))
+    }
 
     override fun onCreate() {
         super.onCreate()

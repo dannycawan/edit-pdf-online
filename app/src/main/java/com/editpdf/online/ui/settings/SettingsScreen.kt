@@ -21,6 +21,10 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,6 +43,7 @@ fun SettingsScreen(
     onNavigateBack: () -> Unit
 ) {
     val context = LocalContext.current
+    var activeDialog by remember { mutableStateOf<SettingsDialogType?>(null) }
 
     Scaffold(
         topBar = {
@@ -88,7 +93,7 @@ fun SettingsScreen(
                     icon = Icons.Outlined.Language,
                     title = stringResource(R.string.settings_language),
                     subtitle = stringResource(R.string.settings_language_current),
-                    onClick = {}
+                    onClick = { activeDialog = SettingsDialogType.LANGUAGE }
                 )
                 HorizontalDivider(
                     modifier = Modifier.padding(start = 56.dp),
@@ -98,7 +103,7 @@ fun SettingsScreen(
                     icon = Icons.Outlined.DarkMode,
                     title = stringResource(R.string.settings_theme),
                     subtitle = stringResource(R.string.settings_theme_current),
-                    onClick = {}
+                    onClick = { activeDialog = SettingsDialogType.THEME }
                 )
             }
 
@@ -157,7 +162,7 @@ fun SettingsScreen(
                     icon = Icons.AutoMirrored.Filled.HelpCenter,
                     title = stringResource(R.string.settings_help),
                     subtitle = stringResource(R.string.settings_help_subtitle),
-                    onClick = {}
+                    onClick = { activeDialog = SettingsDialogType.HELP }
                 )
             }
 
@@ -172,7 +177,7 @@ fun SettingsScreen(
                     icon = Icons.Outlined.PrivacyTip,
                     title = stringResource(R.string.settings_privacy_policy),
                     subtitle = stringResource(R.string.settings_privacy_subtitle),
-                    onClick = {}
+                    onClick = { activeDialog = SettingsDialogType.PRIVACY }
                 )
                 HorizontalDivider(
                     modifier = Modifier.padding(start = 56.dp),
@@ -182,7 +187,7 @@ fun SettingsScreen(
                     icon = Icons.Outlined.Description,
                     title = stringResource(R.string.settings_terms),
                     subtitle = stringResource(R.string.settings_terms_subtitle),
-                    onClick = {}
+                    onClick = { activeDialog = SettingsDialogType.TERMS }
                 )
             }
 
@@ -202,6 +207,53 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
+
+    activeDialog?.let { dialogType ->
+        SettingsInfoDialog(
+            dialogType = dialogType,
+            onDismiss = { activeDialog = null }
+        )
+    }
+}
+
+private enum class SettingsDialogType {
+    LANGUAGE,
+    THEME,
+    HELP,
+    PRIVACY,
+    TERMS
+}
+
+@Composable
+private fun SettingsInfoDialog(
+    dialogType: SettingsDialogType,
+    onDismiss: () -> Unit
+) {
+    val title = when (dialogType) {
+        SettingsDialogType.LANGUAGE -> stringResource(R.string.settings_language_dialog_title)
+        SettingsDialogType.THEME -> stringResource(R.string.settings_theme_dialog_title)
+        SettingsDialogType.HELP -> stringResource(R.string.settings_help_dialog_title)
+        SettingsDialogType.PRIVACY -> stringResource(R.string.settings_privacy_dialog_title)
+        SettingsDialogType.TERMS -> stringResource(R.string.settings_terms_dialog_title)
+    }
+    val message = when (dialogType) {
+        SettingsDialogType.LANGUAGE -> stringResource(R.string.settings_language_dialog_message)
+        SettingsDialogType.THEME -> stringResource(R.string.settings_theme_dialog_message)
+        SettingsDialogType.HELP -> stringResource(R.string.settings_help_dialog_message)
+        SettingsDialogType.PRIVACY -> stringResource(R.string.settings_privacy_dialog_message)
+        SettingsDialogType.TERMS -> stringResource(R.string.settings_terms_dialog_message)
+    }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(title) },
+        text = { Text(message) },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.action_ok))
+            }
+        }
+    )
 }
 
 @Composable

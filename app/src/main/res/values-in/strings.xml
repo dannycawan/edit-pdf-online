@@ -107,7 +107,7 @@
     <string name="export_title">Simpan PDF Hasil Edit</string>
     <string name="export_filename_label">Nama File</string>
     <string name="export_filename_hint">Masukkan nama file</string>
-    <string name="export_saving">Menyimpan PDF…</string>
+    <string name="export_saving">Menyimpan PDF...</string>
     <string name="export_location">Lokasi Simpan</string>
 
     <!-- Settings -->
@@ -135,6 +135,16 @@
     <string name="settings_footer_version">Edit PDF Online v1.0.0</string>
     <string name="settings_share_subject">Edit PDF Online</string>
     <string name="settings_share_text">Coba Edit PDF Online - Text Editor!\nhttps://play.google.com/store/apps/details?id=%1$s</string>
+    <string name="settings_language_dialog_title">Bahasa</string>
+    <string name="settings_language_dialog_message">Bahasa default aplikasi adalah English. Android sebelumnya menampilkan Indonesia karena locale perangkat cocok dengan folder resource Indonesia.</string>
+    <string name="settings_theme_dialog_title">Tema</string>
+    <string name="settings_theme_dialog_message">Tema Light sedang aktif. Tema Dark akan ditambahkan setelah editor dan alat PDF benar-benar stabil.</string>
+    <string name="settings_help_dialog_title">Bantuan &amp; FAQ</string>
+    <string name="settings_help_dialog_message">Buka PDF, pilih alat, edit halaman, lalu simpan atau bagikan file ekspor. Untuk gabung, pisah, putar, hapus halaman, dan konversi, pilih file terlebih dahulu lalu ikuti dialog.</string>
+    <string name="settings_privacy_dialog_title">Kebijakan Privasi</string>
+    <string name="settings_privacy_dialog_message">File diproses secara lokal di perangkat Anda. Aplikasi tidak mengunggah PDF untuk edit, gabung, pisah, putar, hapus halaman, atau konversi.</string>
+    <string name="settings_terms_dialog_title">Ketentuan Layanan</string>
+    <string name="settings_terms_dialog_message">Gunakan aplikasi ini hanya untuk dokumen yang Anda miliki atau boleh Anda edit. Simpan cadangan file penting sebelum mengekspor perubahan.</string>
 
     <!-- Onboarding -->
     <string name="onboarding_title_1">Edit Teks PDF</string>

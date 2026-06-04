@@ -5,15 +5,15 @@
 
 ## Active Task
 
-Melanjutkan setelah update dokumentasi `MASTER_PLAN.md`, `SYSTEM_MAP.md`, dan `DEV_PROGRESS.md`; progress terbaru sudah dicatat dan milestone berikutnya siap dikerjakan.
+Menindaklanjuti laporan runtime dari screenshot: beberapa tombol Settings tidak bereaksi, file PDF kadang ditolak sebagai invalid, dan UI otomatis memakai Bahasa Indonesia pada perangkat ber-locale Indonesia.
 
 ## Current Status
 
-- **Status**: Partially Completed; Milestone 9 Signature, Milestone 10 Fill Form analytics stub, dan Milestone 14 PDF Tools V1.5 selesai secara implementasi.
+- **Status**: Partially Completed; core editor, Signature, Fill Form analytics stub, PDF Tools V1.5, Settings action dialogs, default English locale, dan local debug APK build sudah selesai.
 - **Editor UI & Logic (Milestone 2-8)**: Selesai. Pengguna bisa membuka PDF, menambah overlay teks, blok penutup (cover), mengganti teks, membuat checkmark, dan menyimpannya (export via PdfBox). 
 - **Layar Dukungan**: `HomeScreen`, `RecentFilesScreen`, `ToolsScreen`, dan `SettingsScreen` sudah diimplementasikan beserta ViewModel (Recent files menggunakan Room Database).
 - **Navigation**: Seluruh rute sudah terhubung (`AppNavigation.kt`) menggunakan Compose Navigation dan SAF Picker terintegrasi.
-- **Masalah Utama Lokal**: Validasi lokal masih blocked karena disk penuh di Gradle cache `C:\Users\User\.gradle\caches`.
+- **Masalah Utama Lokal**: `:app:compileDebugKotlin` dan `:app:assembleDebug` sudah sukses lokal. Masih ada warning NDK `source.properties` hilang, tapi bukan blocker build.
 - **GitHub Build**: GitHub Actions `Android Build` run `26954760090` berhasil pada branch `codex/build-validation`; debug APK dan release AAB sudah dibuat sebagai artifacts.
 - **Blocked Eksternal**: Firebase real setup membutuhkan `google-services.json`; AdMob production test membutuhkan production ad unit/app IDs.
 
@@ -24,6 +24,9 @@ Melanjutkan setelah update dokumentasi `MASTER_PLAN.md`, `SYSTEM_MAP.md`, dan `D
 3. **Konfigurasi Tambahan**: FileProvider path sudah benar di XML dan AndroidManifest. Bug `settings.gradle.kts` (penamaan `dependencyResolution`) telah diperbaiki.
 4. **Ads & Analytics**: Masih bersifat stub (siap dihubungkan saat file konfigurasi Firebase masuk).
 5. **Signature Flow**: `SignatureScreen` sudah dibuat; user bisa menggambar tanda tangan, menyimpan PNG transparan, lalu signature ditempatkan kembali ke halaman PDF via `SavedStateHandle`.
+6. **Default Language**: App sekarang memaksa runtime locale English melalui `LocaleUtils.forceEnglish()` di `EditPdfApplication` dan `MainActivity`.
+7. **Settings Actions**: Language, Theme, Help, Privacy Policy, dan Terms of Service sekarang membuka dialog, bukan handler kosong.
+8. **PDF Open Reliability**: SAF URI permission dipersist saat membuka PDF/tool files; validasi PDF sekarang menerima header PDF yang valid atau metadata picker `application/pdf`/`.pdf`.
 
 ## Work Completed
 
@@ -37,16 +40,22 @@ Melanjutkan setelah update dokumentasi `MASTER_PLAN.md`, `SYSTEM_MAP.md`, dan `D
 - [x] Milestone 10: Track Fill Form/checkmark tool analytics via stub.
 - [x] Milestone 14: Merge, Split, Rotate, Delete Pages, Image to PDF, PDF to Image UI + logic.
 - [x] Fix resource blocker: tambah launcher icon vector dan update Manifest dari `@mipmap` ke `@drawable`.
+- [x] Fix default language ke English meski device locale Indonesia.
+- [x] Fix Settings menu yang sebelumnya kosong.
+- [x] Fix validasi PDF agar tidak false-negative pada SAF provider tertentu.
+- [x] Persist read permission untuk PDF/image yang dipilih dari SAF.
+- [x] Build lokal `:app:compileDebugKotlin` dan `:app:assembleDebug` sukses.
 
 ## In Progress
 
-- Build APK/AAB sudah sukses di GitHub Actions. Lokal masih menunggu ruang disk C:; sisa pekerjaan real Firebase/AdMob membutuhkan file/ID eksternal.
+- Build APK/AAB sudah sukses di GitHub Actions untuk baseline sebelumnya. Patch QA terbaru sudah lolos build lokal debug APK dan perlu divalidasi ulang di GitHub Actions untuk debug APK + release AAB.
+- Sisa pekerjaan real Firebase/AdMob membutuhkan file/ID eksternal.
 
 ## Next Exact Steps
 
 Berikut adalah milestone berikutnya berdasarkan kondisi saat ini:
 
-1. **Free Disk Space Lokal**: Kosongkan ruang di drive C: atau pindahkan Gradle cache agar build lokal bisa jalan lagi.
+1. **GitHub Re-validation**: Push patch QA terbaru dan jalankan GitHub Actions sampai debug APK + release AAB sukses.
 2. **Milestone 12: Firebase Setup (external config needed)**
    - Tambahkan file `google-services.json`.
    - Uncomment kode dependency di build.gradle.
@@ -55,7 +64,7 @@ Berikut adalah milestone berikutnya berdasarkan kondisi saat ini:
    - Ganti test ID dengan production ID.
    - Test banner/interstitial di environment production-ready.
 4. **Milestone 15: Device QA**
-   - Test export quality dan large PDF handling setelah APK bisa dibuat.
+   - Install APK terbaru dan test export quality, large PDF handling, password-protected PDF, dan semua tool dengan file nyata.
 
 ## Files Already Read
 
@@ -111,6 +120,10 @@ Berikut adalah milestone berikutnya berdasarkan kondisi saat ini:
 | `ShareUtils.kt` | Tambah share multi-file untuk hasil PDF to image |
 | `HomeScreen.kt` | PDF tool cards diarahkan ke ToolsScreen; Sign/Fill Form membuka picker PDF |
 | `SettingsScreen.kt` | Handler kosong dirapikan dan teks hardcoded dilokalisasi |
+| `EditPdfApplication.kt`, `MainActivity.kt`, `LocaleUtils.kt` | Force default runtime locale ke English |
+| `FileUtils.kt` | Validasi PDF dibuat lebih toleran untuk SAF provider |
+| `AppNavigation.kt`, `ToolsScreen.kt` | Persist read permission untuk URI file yang dipilih |
+| `strings.xml`, `values-in/strings.xml` | Tambah dialog Settings dan perbaiki teks export saving |
 
 ## Important Functions / Flows Touched
 
@@ -139,18 +152,17 @@ Berikut adalah milestone berikutnya berdasarkan kondisi saat ini:
 
 ## Errors / Blockers
 
-- Tidak ada blocker kode yang terkonfirmasi setelah GitHub Actions berhasil.
-- Validasi Gradle lokal tetap blocked oleh disk penuh.
-- `:app:compileDebugKotlin` terbaru tidak bisa start karena Gradle gagal membuat virtual file system: `There is not enough space on the disk`.
-- `:app:assembleDebug` gagal pada task `:app:mergeDebugGlobalSynthetics` karena `There is not enough space on the disk` saat transform/dex dependency di Gradle cache.
+- Tidak ada blocker kode yang terkonfirmasi setelah compile/build lokal debug sukses.
+- Local `:app:bundleRelease --no-daemon` timeout setelah 6 menit pada mesin ini; validasi AAB dilanjutkan via GitHub Actions.
+- Warning lokal tersisa: Gradle mencetak `[CXX1101] NDK at C:\Users\User\AppData\Local\Android\Sdk\ndk\27.0.12077973 did not have a source.properties file`, tetapi `:app:assembleDebug` tetap sukses.
 - Percobaan memakai `GRADLE_USER_HOME` di workspace gagal saat unzip Gradle distribution (`NoSuchFileException` pada zip hasil download) dan meninggalkan folder sementara `.gradle-user-home/`.
 
 ## Validation Status
 
-- **Build**: GitHub Actions `Android Build` run `26954760090` passed. Step `Build debug APK`, `Build release AAB`, `Upload APK`, dan `Upload AAB` semuanya success. Lokal masih gagal karena disk penuh.
+- **Build**: Local `:app:compileDebugKotlin --no-daemon` passed. Local `:app:assembleDebug --no-daemon` passed dan menghasilkan `app/build/outputs/apk/debug/app-debug.apk` ukuran 31,947,389 bytes. Local `:app:bundleRelease --no-daemon` timeout; GitHub Actions `Android Build` run `26954760090` passed untuk baseline sebelumnya dan patch QA terbaru akan divalidasi ulang di GitHub.
 - **Test**: Not run (tidak ada test files ditemukan)
 - **Lint**: Not run
-- **Manual Check**: Passed — seluruh source code telah dibaca dan diverifikasi konsistensinya
+- **Manual Check**: Passed untuk static wiring: tidak ada `onClick = {}` kosong tersisa di source `ui`, Settings menu sudah punya dialog, PDF picker now persists read permission.
 
 ## Do Not Repeat
 
@@ -159,4 +171,4 @@ Berikut adalah milestone berikutnya berdasarkan kondisi saat ini:
 
 ## Resume Note for Next Agent
 
-Aplikasi sudah berhasil menyelesaikan kerangka utamanya (Milestone 1-8 dan 11), plus Milestone 9 Signature, Milestone 10 analytics stub, dan Milestone 14 PDF Tools V1.5 secara implementasi. `SignatureScreen` sudah aktif. `ToolsScreen` sekarang menjalankan merge/split/rotate/delete/image-to-pdf/pdf-to-image. GitHub Actions berhasil membuat debug APK dan release AAB pada run `26954760090`. Lokal masih blocked oleh disk penuh. Lanjut berikutnya: kosongkan ruang drive C:/pindahkan Gradle cache dengan benar untuk build lokal, lalu lanjut real Firebase/AdMob jika file/ID tersedia.
+Aplikasi sudah berhasil menyelesaikan kerangka utamanya (Milestone 1-8 dan 11), plus Milestone 9 Signature, Milestone 10 analytics stub, dan Milestone 14 PDF Tools V1.5 secara implementasi. `SignatureScreen` sudah aktif. `ToolsScreen` menjalankan merge/split/rotate/delete/image-to-pdf/pdf-to-image. Patch QA terbaru memaksa default English, mengaktifkan semua item Settings, memperbaiki validasi PDF SAF, dan berhasil build lokal debug APK. Lanjut berikutnya: push patch QA dan validasi ulang GitHub Actions sampai debug APK + release AAB sukses, lalu lanjut real Firebase/AdMob jika file/ID tersedia.
