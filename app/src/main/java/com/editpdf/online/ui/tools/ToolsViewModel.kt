@@ -41,7 +41,7 @@ class ToolsViewModel(application: Application) : AndroidViewModel(application) {
     private val pageToolManager = PdfPageToolManager(context)
     private val conversionManager = PdfConversionManager(context)
     private val analyticsTracker = AnalyticsTracker(context)
-    private val adFrequencyManager = AdFrequencyManager(RemoteConfigManager(context))
+    private val adFrequencyManager = AdFrequencyManager(RemoteConfigManager())
 
     private val _uiState = MutableStateFlow(ToolsUiState())
     val uiState: StateFlow<ToolsUiState> = _uiState.asStateFlow()
