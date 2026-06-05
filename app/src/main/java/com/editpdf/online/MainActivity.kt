@@ -22,7 +22,7 @@ import com.editpdf.online.utils.LocaleUtils
 class MainActivity : ComponentActivity() {
 
     override fun attachBaseContext(newBase: Context) {
-        super.attachBaseContext(LocaleUtils.forceEnglish(newBase))
+        super.attachBaseContext(LocaleUtils.applyAppLocale(newBase))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

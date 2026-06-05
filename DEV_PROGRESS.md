@@ -1,5 +1,5 @@
 # DEV_PROGRESS.md — Edit PDF Online - Text Editor
-> Terakhir diperbarui: 2026-06-04
+> Terakhir diperbarui: 2026-06-05
 
 ---
 
@@ -13,7 +13,9 @@ Menindaklanjuti laporan runtime dari screenshot: beberapa tombol Settings tidak 
 - **Editor UI & Logic (Milestone 2-8)**: Selesai. Pengguna bisa membuka PDF, menambah overlay teks, blok penutup (cover), mengganti teks, membuat checkmark, dan menyimpannya (export via PdfBox). 
 - **Layar Dukungan**: `HomeScreen`, `RecentFilesScreen`, `ToolsScreen`, dan `SettingsScreen` sudah diimplementasikan beserta ViewModel (Recent files menggunakan Room Database).
 - **Navigation**: Seluruh rute sudah terhubung (`AppNavigation.kt`) menggunakan Compose Navigation dan SAF Picker terintegrasi.
-- **Masalah Utama Lokal**: `:app:compileDebugKotlin` dan `:app:assembleDebug` sudah sukses lokal. Masih ada warning NDK `source.properties` hilang, tapi bukan blocker build.
+- **Masalah Utama Lokal**: Build APK berhasil. Warning NDK `source.properties` hilang bukan blocker. Error "password-protected" palsu sudah diperbaiki (PdfRenderer fallback ke direct FD dan integrity check temp file).
+- **Lokalisasi & Strings**: Locale kini deteksi device (Bahasa Indonesia untuk ID, English untuk lainnya). Semua string hardcoded di UI telah dipindahkan ke `strings.xml` (EN & ID).
+- **Analytics & Crashlytics**: Fungsi stub kini terhubung pada event kunci (open PDF, export PDF, errors).
 - **GitHub Build**: GitHub Actions `Android Build` run `26960485576` berhasil pada branch `codex/qa-validation`; debug APK dan release AAB patch QA terbaru sudah dibuat sebagai artifacts.
 - **Blocked Eksternal**: Firebase real setup membutuhkan `google-services.json`; AdMob production test membutuhkan production ad unit/app IDs.
 
@@ -24,9 +26,11 @@ Menindaklanjuti laporan runtime dari screenshot: beberapa tombol Settings tidak 
 3. **Konfigurasi Tambahan**: FileProvider path sudah benar di XML dan AndroidManifest. Bug `settings.gradle.kts` (penamaan `dependencyResolution`) telah diperbaiki.
 4. **Ads & Analytics**: Masih bersifat stub (siap dihubungkan saat file konfigurasi Firebase masuk).
 5. **Signature Flow**: `SignatureScreen` sudah dibuat; user bisa menggambar tanda tangan, menyimpan PNG transparan, lalu signature ditempatkan kembali ke halaman PDF via `SavedStateHandle`.
-6. **Default Language**: App sekarang memaksa runtime locale English melalui `LocaleUtils.forceEnglish()` di `EditPdfApplication` dan `MainActivity`.
-7. **Settings Actions**: Language, Theme, Help, Privacy Policy, dan Terms of Service sekarang membuka dialog, bukan handler kosong.
-8. **PDF Open Reliability**: SAF URI permission dipersist saat membuka PDF/tool files; validasi PDF sekarang menerima header PDF yang valid atau metadata picker `application/pdf`/`.pdf`.
+6. **Default Language**: Perbaikan deteksi locale. Aplikasi sekarang mendeteksi bahasa perangkat; jika Indonesia (`in`/`id`), menggunakan Bahasa Indonesia, selain itu memaksa English via `LocaleUtils.applyAppLocale()`.
+7. **Settings Actions**: Language, Theme, Help, Privacy Policy, dan Terms of Service membuka dialog dengan pesan yang telah disesuaikan (termasuk penjelasan locale otomatis).
+8. **PDF Open Reliability**: Error "password-protected" palsu sudah ditangani dengan retry copy temp file, integrity check (size > 0), dan fallback langsung menggunakan SAF file descriptor.
+9. **UI Strings**: Lebih dari 20 teks hardcoded telah diganti menggunakan resource `strings.xml`.
+10. **Connected Functions**: CrashReporter dan AnalyticsTracker kini dipanggil saat error, open PDF, dan export PDF. Interstitial ad terhubung dengan frequency manager setelah export sukses.
 
 ## Work Completed
 
@@ -40,11 +44,12 @@ Menindaklanjuti laporan runtime dari screenshot: beberapa tombol Settings tidak 
 - [x] Milestone 10: Track Fill Form/checkmark tool analytics via stub.
 - [x] Milestone 14: Merge, Split, Rotate, Delete Pages, Image to PDF, PDF to Image UI + logic.
 - [x] Fix resource blocker: tambah launcher icon vector dan update Manifest dari `@mipmap` ke `@drawable`.
-- [x] Fix default language ke English meski device locale Indonesia.
-- [x] Fix Settings menu yang sebelumnya kosong.
-- [x] Fix validasi PDF agar tidak false-negative pada SAF provider tertentu.
-- [x] Persist read permission untuk PDF/image yang dipilih dari SAF.
-- [x] Build lokal `:app:compileDebugKotlin` dan `:app:assembleDebug` sukses.
+- [x] Fix default language agar otomatis menggunakan Bahasa Indonesia di perangkat ID, dan English di device lain.
+- [x] Fix Settings menu yang sebelumnya kosong dan lokalisasi pesan dialog.
+- [x] Fix validasi PDF dan error `SecurityException` (password-protected palsu) di `PdfRendererManager` dengan retry, integrity check, dan direct FD fallback.
+- [x] Ganti semua teks bahasa Inggris yang di-hardcode di UI dengan string resources (`strings.xml` EN & ID).
+- [x] Hubungkan stub Analytics, Crashlytics, dan Interstitial Ad pada event utama.
+- [x] Build lokal sukses.
 
 ## In Progress
 

@@ -136,7 +136,7 @@
     <string name="settings_share_subject">Edit PDF Online</string>
     <string name="settings_share_text">Coba Edit PDF Online - Text Editor!\nhttps://play.google.com/store/apps/details?id=%1$s</string>
     <string name="settings_language_dialog_title">Bahasa</string>
-    <string name="settings_language_dialog_message">Bahasa default aplikasi adalah English. Android sebelumnya menampilkan Indonesia karena locale perangkat cocok dengan folder resource Indonesia.</string>
+    <string name="settings_language_dialog_message">Aplikasi otomatis menggunakan Bahasa Indonesia untuk perangkat dengan pengaturan Indonesia, dan Bahasa Inggris untuk bahasa lainnya.</string>
     <string name="settings_theme_dialog_title">Tema</string>
     <string name="settings_theme_dialog_message">Tema Light sedang aktif. Tema Dark akan ditambahkan setelah editor dan alat PDF benar-benar stabil.</string>
     <string name="settings_help_dialog_title">Bantuan &amp; FAQ</string>
@@ -177,4 +177,23 @@
     <string name="error_permission">Izin penyimpanan diperlukan</string>
     <string name="error_no_app_share">Tidak ada aplikasi untuk membagikan file ini</string>
     <string name="error_generic">Terjadi kesalahan. Silakan coba lagi.</string>
+
+    <!-- Editor Extra -->
+    <string name="editor_loading_pdf">Memuat PDF…</string>
+    <string name="editor_bold">Tebal</string>
+    <string name="editor_previous_page">Halaman sebelumnya</string>
+    <string name="editor_next_page">Halaman berikutnya</string>
+    <string name="editor_pdf_page_cd">Halaman PDF %1$d</string>
+    <string name="editor_pages_count">%1$d halaman</string>
+
+    <!-- Export Extra -->
+    <string name="export_save_as">Simpan Sebagai…</string>
+    <string name="export_success_message">PDF berhasil diekspor!</string>
+
+    <!-- Recent Files Extra -->
+    <string name="files_clear_all_cd">Hapus semua</string>
+    <string name="files_clear_all_title">Hapus Semua File Terbaru?</string>
+    <string name="files_clear_all_message">Ini akan menghapus semua file dari daftar terbaru Anda. File PDF asli tidak akan dihapus.</string>
+    <string name="files_clear_all_confirm">Hapus Semua</string>
+    <string name="files_exported">Diekspor</string>
 </resources>

@@ -487,7 +487,7 @@ private fun RecentFileItem(
                             color = TextSecondary
                         )
                         Text(
-                            text = "${file.pageCount} pages",
+                            text = stringResource(R.string.editor_pages_count, file.pageCount),
                             style = MaterialTheme.typography.labelSmall,
                             color = TextSecondary
                         )

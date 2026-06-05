@@ -71,7 +71,7 @@ fun ExportDialog(
                         modifier = Modifier.size(56.dp)
                     )
                     Text(
-                        text = "PDF has been exported successfully!",
+                        text = stringResource(R.string.export_success_message),
                         style = MaterialTheme.typography.bodyMedium,
                         color = TextSecondary
                     )
@@ -151,7 +151,7 @@ fun ExportDialog(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Text("Save As...")
+                        Text(stringResource(R.string.export_save_as))
                     }
                 }
             }

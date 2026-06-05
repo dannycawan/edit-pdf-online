@@ -10,6 +10,7 @@ package com.editpdf.online.pdf
 import android.content.Context
 import android.graphics.BitmapFactory
 import android.net.Uri
+import com.editpdf.online.analytics.CrashReporter
 import com.editpdf.online.domain.model.PdfEditObject
 import com.tom_roush.pdfbox.pdmodel.PDDocument
 import com.tom_roush.pdfbox.pdmodel.PDPageContentStream
@@ -82,6 +83,7 @@ class PdfExportManager(private val context: Context) {
             document.save(outputStream)
             Result.success(Unit)
         } catch (e: Exception) {
+            CrashReporter.logError(e, "PdfExportManager.exportPdf")
             Result.failure(Exception("Export failed: ${e.message}"))
         } finally {
             try {
@@ -198,7 +200,8 @@ class PdfExportManager(private val context: Context) {
 
             contentStream.drawImage(pdImage, pdfX, pdfY, obj.width, obj.height)
             bitmap.recycle()
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            CrashReporter.logError(e, "PdfExportManager.drawSignatureObject")
             // Skip signature if image cannot be loaded
         }
     }

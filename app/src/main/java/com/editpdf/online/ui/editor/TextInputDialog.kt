@@ -121,7 +121,7 @@ fun TextInputDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Bold",
+                        text = stringResource(R.string.editor_bold),
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.SemiBold,
                         color = OnBackground

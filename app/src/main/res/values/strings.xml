@@ -136,7 +136,7 @@
     <string name="settings_share_subject">Edit PDF Online</string>
     <string name="settings_share_text">Check out Edit PDF Online - Text Editor!\nhttps://play.google.com/store/apps/details?id=%1$s</string>
     <string name="settings_language_dialog_title">Language</string>
-    <string name="settings_language_dialog_message">English is the default app language. Android previously showed Indonesian because the device locale matched the Indonesian resource folder.</string>
+    <string name="settings_language_dialog_message">The app automatically uses Indonesian for devices set to Indonesian, and English for all other languages.</string>
     <string name="settings_theme_dialog_title">Theme</string>
     <string name="settings_theme_dialog_message">Light theme is active. Dark theme will be added after the editor and PDF tools are fully stabilized.</string>
     <string name="settings_help_dialog_title">Help &amp; FAQ</string>
@@ -177,4 +177,23 @@
     <string name="error_permission">Storage permission is required</string>
     <string name="error_no_app_share">No app available to share this file</string>
     <string name="error_generic">Something went wrong. Please try again.</string>
+
+    <!-- Editor Extra -->
+    <string name="editor_loading_pdf">Loading PDF…</string>
+    <string name="editor_bold">Bold</string>
+    <string name="editor_previous_page">Previous page</string>
+    <string name="editor_next_page">Next page</string>
+    <string name="editor_pdf_page_cd">PDF Page %1$d</string>
+    <string name="editor_pages_count">%1$d pages</string>
+
+    <!-- Export Extra -->
+    <string name="export_save_as">Save As…</string>
+    <string name="export_success_message">PDF has been exported successfully!</string>
+
+    <!-- Recent Files Extra -->
+    <string name="files_clear_all_cd">Clear all</string>
+    <string name="files_clear_all_title">Clear All Recent Files?</string>
+    <string name="files_clear_all_message">This will remove all files from your recent list. The actual PDF files will not be deleted.</string>
+    <string name="files_clear_all_confirm">Clear All</string>
+    <string name="files_exported">Exported</string>
 </resources>

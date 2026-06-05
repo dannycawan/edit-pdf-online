@@ -131,7 +131,7 @@ fun EditorScreen(
                     CircularProgressIndicator(color = SecondaryBlue)
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        "Loading PDF...",
+                        stringResource(R.string.editor_loading_pdf),
                         style = MaterialTheme.typography.bodyMedium,
                         color = TextSecondary
                     )
@@ -152,7 +152,7 @@ fun EditorScreen(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        state.errorMessage ?: "Unknown error",
+                        state.errorMessage ?: stringResource(R.string.error_generic),
                         style = MaterialTheme.typography.bodyMedium,
                         color = ErrorRed,
                         textAlign = TextAlign.Center
@@ -319,7 +319,7 @@ private fun PdfCanvasWithOverlays(
         // PDF page bitmap
         Image(
             bitmap = bitmap.asImageBitmap(),
-            contentDescription = "PDF Page ${state.currentPage + 1}",
+            contentDescription = stringResource(R.string.editor_pdf_page_cd, state.currentPage + 1),
             modifier = Modifier
                 .fillMaxSize()
                 .onSizeChanged { onCanvasSizeChanged(it) }
@@ -438,7 +438,7 @@ private fun EditorTopBar(
                 )
                 if (totalPages > 0) {
                     Text(
-                        text = "Page ${currentPage + 1} of $totalPages",
+                        text = stringResource(R.string.editor_page_indicator, currentPage + 1, totalPages),
                         style = MaterialTheme.typography.labelSmall,
                         color = OnPrimary.copy(alpha = 0.7f)
                     )
@@ -626,7 +626,7 @@ private fun PageNavigationBar(
             ) {
                 Icon(
                     Icons.Default.ChevronLeft,
-                    contentDescription = "Previous page",
+                    contentDescription = stringResource(R.string.editor_previous_page),
                     tint = if (currentPage > 0) PrimaryNavy else TextHint
                 )
             }
@@ -654,7 +654,7 @@ private fun PageNavigationBar(
             ) {
                 Icon(
                     Icons.Default.ChevronRight,
-                    contentDescription = "Next page",
+                    contentDescription = stringResource(R.string.editor_next_page),
                     tint = if (currentPage < totalPages - 1) PrimaryNavy else TextHint
                 )
             }

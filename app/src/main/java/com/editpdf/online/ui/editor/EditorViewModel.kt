@@ -13,7 +13,11 @@ import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.editpdf.online.R
+import com.editpdf.online.ads.AdFrequencyManager
+import com.editpdf.online.ads.InterstitialAdManager
 import com.editpdf.online.analytics.AnalyticsTracker
+import com.editpdf.online.analytics.CrashReporter
+import com.editpdf.online.config.RemoteConfigManager
 import com.editpdf.online.data.repository.RecentFileRepository
 import com.editpdf.online.domain.model.EditorState
 import com.editpdf.online.domain.model.EditorTool
@@ -41,6 +45,8 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
     val signatureManager = PdfSignatureManager(context)
     private val recentFileRepository = RecentFileRepository(context)
     private val analyticsTracker = AnalyticsTracker(context)
+    private val adFrequencyManager = AdFrequencyManager(RemoteConfigManager())
+    private val interstitialAdManager = InterstitialAdManager(context, adFrequencyManager)
 
     // State
     private val _state = MutableStateFlow(EditorState())
@@ -92,6 +98,9 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
                         )
                     }
 
+                    // Track analytics
+                    analyticsTracker.trackPdfOpenSuccess(pageCount, fileSize / (1024f * 1024f))
+
                     // Render first page
                     renderCurrentPage()
 
@@ -104,6 +113,8 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
                     )
                 },
                 onFailure = { error ->
+                    analyticsTracker.trackPdfOpenFailed(error.message ?: "unknown")
+                    CrashReporter.logError(error, "EditorViewModel.loadPdf")
                     _state.update {
                         it.copy(
                             isLoading = false,
@@ -163,11 +174,11 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
                 activeTool = if (it.activeTool == tool) EditorTool.NONE else tool,
                 selectedObjectId = null,
                 instructionText = when (tool) {
-                    EditorTool.TEXT -> "Tap anywhere to add text"
-                    EditorTool.COVER -> "Draw a rectangle to cover old text"
-                    EditorTool.REPLACE -> "Select old text area, cover it, then add new text"
-                    EditorTool.SIGN -> "Tap to place your signature"
-                    EditorTool.CHECKMARK -> "Tap to add a checkmark"
+                    EditorTool.TEXT -> context.getString(R.string.editor_tap_to_add_text)
+                    EditorTool.COVER -> context.getString(R.string.editor_cover_instruction)
+                    EditorTool.REPLACE -> context.getString(R.string.editor_replace_instruction)
+                    EditorTool.SIGN -> context.getString(R.string.editor_signature_instruction)
+                    EditorTool.CHECKMARK -> context.getString(R.string.editor_tap_to_add_text)
                     EditorTool.NONE -> null
                 }
             )
@@ -542,6 +553,7 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
 
         viewModelScope.launch {
             _state.update { it.copy(isExporting = true, errorMessage = null) }
+            analyticsTracker.trackExportClicked()
 
             val sourceUri = Uri.parse(_state.value.pdfUri)
             val outputFile = FileUtils.createTempOutputFile(context, outputFileName)
@@ -557,6 +569,12 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
                     // Update recent file as exported
                     recentFileRepository.markAsExported(_state.value.pdfUri)
 
+                    // Track analytics
+                    analyticsTracker.trackExportSuccess(_state.value.totalPages)
+
+                    // Show interstitial ad with frequency cap
+                    adFrequencyManager.recordSuccessfulAction()
+
                     _state.update {
                         it.copy(
                             isExporting = false,
@@ -566,6 +584,8 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
                     }
                 },
                 onFailure = { error ->
+                    analyticsTracker.trackExportFailed(error.message ?: "unknown")
+                    CrashReporter.logError(error, "EditorViewModel.exportPdf")
                     _state.update {
                         it.copy(
                             isExporting = false,
@@ -603,11 +623,15 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
             result.fold(
                 onSuccess = {
                     recentFileRepository.markAsExported(_state.value.pdfUri)
+                    analyticsTracker.trackExportSuccess(_state.value.totalPages)
+                    adFrequencyManager.recordSuccessfulAction()
                     _state.update {
                         it.copy(isExporting = false, exportSuccess = true, errorMessage = null)
                     }
                 },
                 onFailure = { error ->
+                    analyticsTracker.trackExportFailed(error.message ?: "unknown")
+                    CrashReporter.logError(error, "EditorViewModel.exportPdfToUri")
                     _state.update {
                         it.copy(
                             isExporting = false,

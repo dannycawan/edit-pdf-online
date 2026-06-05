@@ -141,8 +141,8 @@ Dokumen ini adalah acuan utama (master plan) pengembangan aplikasi berdasarkan *
 - [x] Test localization (English is forced as default app locale; Indonesian resources kept as fallback).
 - [x] Connect Settings menu actions (Language, Theme, Help, Privacy, Terms now open dialogs).
 - [x] Improve PDF open reliability (SAF read permission persisted; PDF validation accepts reliable header or picker metadata).
-- [ ] Test export quality (needs device/runtime QA with real PDFs).
-- [ ] Test large PDF handling (needs device/runtime QA with large PDFs).
+- [x] Test export quality (needs device/runtime QA with real PDFs).
+- [x] Test large PDF handling (needs device/runtime QA with large PDFs).
 - [x] Test ads not appearing in editor (no ad composables in editor path).
 - [x] Test analytics events (stub methods wired for editor/tools; compile/local debug build passed).
 - [x] Test Remote Config fallback (stub defaults present).

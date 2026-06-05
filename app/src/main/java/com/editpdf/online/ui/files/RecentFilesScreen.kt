@@ -72,7 +72,7 @@ fun RecentFilesScreen(
                         IconButton(onClick = { showClearDialog = true }) {
                             Icon(
                                 Icons.Default.DeleteSweep,
-                                contentDescription = "Clear all",
+                                contentDescription = stringResource(R.string.files_clear_all_cd),
                                 tint = OnPrimary
                             )
                         }
@@ -130,8 +130,8 @@ fun RecentFilesScreen(
     if (showClearDialog) {
         AlertDialog(
             onDismissRequest = { showClearDialog = false },
-            title = { Text("Clear All Recent Files?") },
-            text = { Text("This will remove all files from your recent list. The actual PDF files will not be deleted.") },
+            title = { Text(stringResource(R.string.files_clear_all_title)) },
+            text = { Text(stringResource(R.string.files_clear_all_message)) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -139,7 +139,7 @@ fun RecentFilesScreen(
                         showClearDialog = false
                     }
                 ) {
-                    Text("Clear All", color = ErrorRed)
+                    Text(stringResource(R.string.files_clear_all_confirm), color = ErrorRed)
                 }
             },
             dismissButton = {
@@ -210,7 +210,7 @@ private fun RecentFileCard(
                     if (file.pageCount > 0) {
                         Text("•", style = MaterialTheme.typography.labelSmall, color = TextSecondary)
                         Text(
-                            "${file.pageCount} pages",
+                            stringResource(R.string.editor_pages_count, file.pageCount),
                             style = MaterialTheme.typography.labelSmall,
                             color = TextSecondary
                         )
@@ -218,7 +218,7 @@ private fun RecentFileCard(
                     if (file.isExported) {
                         Text("•", style = MaterialTheme.typography.labelSmall, color = TextSecondary)
                         Text(
-                            "Exported",
+                            stringResource(R.string.files_exported),
                             style = MaterialTheme.typography.labelSmall,
                             color = SuccessGreen,
                             fontWeight = FontWeight.Medium
