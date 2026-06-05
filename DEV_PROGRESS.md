@@ -16,7 +16,7 @@ Menutup patch QA renderer/lokalisasi: local `main` sudah dipaksa ke `origin/main
 - **Masalah Utama Lokal**: Build APK berhasil. Warning NDK `source.properties` hilang bukan blocker. Error "password-protected" palsu sudah diperbaiki (PdfRenderer fallback ke direct FD dan integrity check temp file).
 - **Lokalisasi & Strings**: Locale kini deteksi device (Bahasa Indonesia untuk ID, English untuk lainnya). Semua string hardcoded di UI telah dipindahkan ke `strings.xml` (EN & ID).
 - **Analytics & Crashlytics**: Fungsi stub kini terhubung pada event kunci (open PDF, export PDF, errors).
-- **GitHub Build**: GitHub Actions `Android Build` run `27013278538` berhasil pada branch `main` setelah force push lokal; debug APK dan release AAB terbaru sudah diupload sebagai artifacts.
+- **GitHub Build**: GitHub Actions `Android Build` run `27015876147` berhasil pada branch `main` setelah update dokumentasi; debug APK dan release AAB terbaru sudah diupload sebagai artifacts.
 - **Blocked Eksternal**: Firebase real setup membutuhkan `google-services.json`; AdMob production test membutuhkan production ad unit/app IDs.
 
 ## What Has Been Confirmed
@@ -51,7 +51,7 @@ Menutup patch QA renderer/lokalisasi: local `main` sudah dipaksa ke `origin/main
 - [x] Hubungkan stub Analytics, Crashlytics, dan Interstitial Ad pada event utama.
 - [x] Build lokal sukses.
 - [x] Force push local `main` ke `origin/main` pada commit `664d6c6`.
-- [x] GitHub Actions push-to-main sukses (`Android Build` run `27013278538`).
+- [x] GitHub Actions push-to-main sukses (`Android Build` run `27015876147`).
 
 ## In Progress
 
@@ -166,8 +166,8 @@ Berikut adalah milestone berikutnya berdasarkan kondisi saat ini:
 
 ## Validation Status
 
-- **Build**: GitHub Actions `Android Build` run `27013278538` passed pada branch `main` setelah force push local commit `664d6c6`. Step `Build debug APK`, `Build release AAB`, `Upload APK`, dan `Upload AAB` semuanya `success`.
-- **GitHub Artifacts**: `edit-pdf-online-debug-apk` id `7435941999`, size 31,054,175 bytes, digest `sha256:0f1b882c44920300ec002fee9d369f81456af1cfc54bbe40f752dfa570a17754`; `edit-pdf-online-release-aab` id `7435942402`, size 13,549,593 bytes, digest `sha256:6467ba6798559cd77d1ad25875be19fe7777c5fa12792d34e2faf33b1bd08d03`.
+- **Build**: GitHub Actions `Android Build` run `27015876147` passed pada branch `main` setelah update dokumentasi commit `1465c8f`. Step `Build debug APK`, `Build release AAB`, `Upload APK`, dan `Upload AAB` semuanya `success`.
+- **GitHub Artifacts**: `edit-pdf-online-debug-apk` id `7437022247`, size 31,054,177 bytes, digest `sha256:46d310231d5725216d18014b13a5fe382283e750eb9c5feff230ed0cbd8c43ad`; `edit-pdf-online-release-aab` id `7437022746`, size 13,549,587 bytes, digest `sha256:cef0a9e8bb43473372dae018f16b067167fcff83e0a638c8700823932321b697`.
 - **Test**: Not run (tidak ada test files ditemukan)
 - **Lint**: Not run
 - **Manual Check**: Passed untuk static wiring: tidak ada `onClick = {}` kosong tersisa di source `ui`, Settings menu sudah punya dialog, PDF picker now persists read permission.
@@ -179,4 +179,4 @@ Berikut adalah milestone berikutnya berdasarkan kondisi saat ini:
 
 ## Resume Note for Next Agent
 
-Aplikasi sudah berhasil menyelesaikan kerangka utamanya (Milestone 1-8 dan 11), plus Milestone 9 Signature, Milestone 10 analytics stub, dan Milestone 14 PDF Tools V1.5 secara implementasi. `SignatureScreen` sudah aktif. `ToolsScreen` menjalankan merge/split/rotate/delete/image-to-pdf/pdf-to-image. Patch QA terbaru memakai locale device-aware, mengaktifkan semua item Settings, memperbaiki validasi PDF SAF, dan menggabungkan stabilisasi `PdfRendererManager` dari `origin/main`. Local `main` sudah dipaksa ke `origin/main` pada commit `664d6c6`; GitHub Actions run `27013278538` sukses dan artifact APK/AAB terbaru tersedia. Lanjut berikutnya: install artifact APK terbaru untuk device QA, lalu lanjut real Firebase/AdMob jika file/ID tersedia.
+Aplikasi sudah berhasil menyelesaikan kerangka utamanya (Milestone 1-8 dan 11), plus Milestone 9 Signature, Milestone 10 analytics stub, dan Milestone 14 PDF Tools V1.5 secara implementasi. `SignatureScreen` sudah aktif. `ToolsScreen` menjalankan merge/split/rotate/delete/image-to-pdf/pdf-to-image. Patch QA terbaru memakai locale device-aware, mengaktifkan semua item Settings, memperbaiki validasi PDF SAF, dan menggabungkan stabilisasi `PdfRendererManager` dari `origin/main`. Local `main` sudah dipaksa ke `origin/main` pada commit `664d6c6`; GitHub Actions run `27015876147` sukses dan artifact APK/AAB terbaru tersedia. Lanjut berikutnya: install artifact APK terbaru untuk device QA, lalu lanjut real Firebase/AdMob jika file/ID tersedia.

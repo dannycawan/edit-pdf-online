@@ -301,8 +301,8 @@ edit pdf online/
 ## Build & Release Status
 
 - **Remote utama**: `origin/main` sudah mengikuti commit lokal `664d6c6` setelah force push.
-- **GitHub Actions**: `Android Build` run `27013278538` pada branch `main` selesai `success`.
-- **Artifacts terbaru**: APK `edit-pdf-online-debug-apk` id `7435941999`; AAB `edit-pdf-online-release-aab` id `7435942402`.
+- **GitHub Actions**: `Android Build` run `27015876147` pada branch `main` selesai `success`.
+- **Artifacts terbaru**: APK `edit-pdf-online-debug-apk` id `7437022247`; AAB `edit-pdf-online-release-aab` id `7437022746`.
 
 ---
 
