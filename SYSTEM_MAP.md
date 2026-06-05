@@ -179,8 +179,8 @@ edit pdf online/
 
 | File | Fungsi/Class Utama | Peran |
 |------|-------------------|-------|
-| `EditPdfApplication.kt` | `EditPdfApplication.attachBaseContext()`, `EditPdfApplication.onCreate()` | Force default English locale dan inisialisasi PdfBox-Android resource loader saat app start |
-| `MainActivity.kt` | `MainActivity.attachBaseContext()`, `MainActivity.onCreate()` | Force default English locale, lalu host Compose content dengan theme + navigation |
+| `EditPdfApplication.kt` | `EditPdfApplication.attachBaseContext()`, `EditPdfApplication.onCreate()` | Menerapkan runtime locale device-aware dan inisialisasi PdfBox-Android resource loader saat app start |
+| `MainActivity.kt` | `MainActivity.attachBaseContext()`, `MainActivity.onCreate()` | Menerapkan runtime locale device-aware, lalu host Compose content dengan theme + navigation |
 | `AppNavigation.kt` | `AppNavigation()`, `Routes` object | Definisi semua route & NavHost; startDestination = HOME |
 
 ### UI Layer
@@ -297,6 +297,12 @@ edit pdf online/
 | Android PdfRenderer | `PdfRendererManager.kt` | Aktif |
 | Android SAF (Storage Access Framework) | `FileUtils.kt`, semua PDF managers | Aktif |
 | FileProvider | `ShareUtils.kt`, `AndroidManifest.xml`, `file_paths.xml` | Aktif untuk share exported PDF |
+
+## Build & Release Status
+
+- **Remote utama**: `origin/main` sudah mengikuti commit lokal `664d6c6` setelah force push.
+- **GitHub Actions**: `Android Build` run `27013278538` pada branch `main` selesai `success`.
+- **Artifacts terbaru**: APK `edit-pdf-online-debug-apk` id `7435941999`; AAB `edit-pdf-online-release-aab` id `7435942402`.
 
 ---
 

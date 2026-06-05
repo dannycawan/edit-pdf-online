@@ -134,8 +134,10 @@ Dokumen ini adalah acuan utama (master plan) pengembangan aplikasi berdasarkan *
 - [x] Interstitial only after successful tool completion and frequency cap.
 
 ## Milestone 15: Final Polish 🔄 (In Progress)
-- [x] Build debug APK and release AAB on GitHub Actions (latest completed run `26960485576` passed; current PR validation will rerun on GitHub).
+- [x] Build debug APK and release AAB on GitHub Actions after force push to `main` (latest run `27013278538` passed).
 - [x] Merge latest `origin/main` PdfRenderer stabilization and keep SAF access error handling.
+- [x] Force push local `main` to `origin/main` at commit `664d6c6`.
+- [x] Upload latest GitHub artifacts: APK id `7435941999`, AAB id `7435942402`.
 - [x] Improve UI spacing (tools UI updated).
 - [x] Improve error messages (tools flow messages added/localized; editor invalid/open/export errors use resource strings).
 - [x] Test localization (Indonesian devices use Bahasa Indonesia; all other locales use English).
