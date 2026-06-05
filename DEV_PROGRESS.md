@@ -9,14 +9,14 @@ Menindaklanjuti laporan runtime dari screenshot: beberapa tombol Settings tidak 
 
 ## Current Status
 
-- **Status**: Partially Completed; core editor, Signature, Fill Form analytics stub, PDF Tools V1.5, Settings action dialogs, default English locale, dan local debug APK build sudah selesai.
+- **Status**: Partially Completed; core editor, Signature, Fill Form analytics stub, PDF Tools V1.5, Settings action dialogs, device-aware locale, dan renderer stabilization sudah selesai.
 - **Editor UI & Logic (Milestone 2-8)**: Selesai. Pengguna bisa membuka PDF, menambah overlay teks, blok penutup (cover), mengganti teks, membuat checkmark, dan menyimpannya (export via PdfBox). 
 - **Layar Dukungan**: `HomeScreen`, `RecentFilesScreen`, `ToolsScreen`, dan `SettingsScreen` sudah diimplementasikan beserta ViewModel (Recent files menggunakan Room Database).
 - **Navigation**: Seluruh rute sudah terhubung (`AppNavigation.kt`) menggunakan Compose Navigation dan SAF Picker terintegrasi.
 - **Masalah Utama Lokal**: Build APK berhasil. Warning NDK `source.properties` hilang bukan blocker. Error "password-protected" palsu sudah diperbaiki (PdfRenderer fallback ke direct FD dan integrity check temp file).
 - **Lokalisasi & Strings**: Locale kini deteksi device (Bahasa Indonesia untuk ID, English untuk lainnya). Semua string hardcoded di UI telah dipindahkan ke `strings.xml` (EN & ID).
 - **Analytics & Crashlytics**: Fungsi stub kini terhubung pada event kunci (open PDF, export PDF, errors).
-- **GitHub Build**: GitHub Actions `Android Build` run `26960485576` berhasil pada branch `codex/qa-validation`; debug APK dan release AAB patch QA terbaru sudah dibuat sebagai artifacts.
+- **GitHub Build**: GitHub Actions `Android Build` run `26960485576` berhasil pada branch `codex/qa-validation`; validasi patch saat ini akan dijalankan ulang melalui PR branch di GitHub.
 - **Blocked Eksternal**: Firebase real setup membutuhkan `google-services.json`; AdMob production test membutuhkan production ad unit/app IDs.
 
 ## What Has Been Confirmed
@@ -53,7 +53,7 @@ Menindaklanjuti laporan runtime dari screenshot: beberapa tombol Settings tidak 
 
 ## In Progress
 
-- Build APK/AAB patch QA terbaru sudah sukses di GitHub Actions.
+- Build APK/AAB patch QA sebelumnya sudah sukses di GitHub Actions; patch saat ini menunggu validasi GitHub Actions dari PR branch.
 - Sisa pekerjaan real Firebase/AdMob membutuhkan file/ID eksternal.
 
 ## Next Exact Steps
@@ -112,7 +112,7 @@ Berikut adalah milestone berikutnya berdasarkan kondisi saat ini:
 |------|-----------|
 | `SYSTEM_MAP.md` | Baru dibuat — peta arsitektur lengkap |
 | `DEV_PROGRESS.md` | Baru dibuat — catatan progres pengembangan |
-| `MASTER_PLAN.md` | Update status Milestone 9 dan Milestone 10 |
+| `MASTER_PLAN.md` | Update status Milestone 9, Milestone 10, renderer stabilization, dan validasi GitHub |
 | `AppNavigation.kt` | Route SignatureScreen aktif dan return signature path via SavedStateHandle |
 | `EditorScreen.kt` | Menerima signature path dan navigasi dari tool Sign |
 | `EditorViewModel.kt` | Simpan pending tap, place signature, analytics tool selection |
@@ -164,7 +164,7 @@ Berikut adalah milestone berikutnya berdasarkan kondisi saat ini:
 
 ## Validation Status
 
-- **Build**: Local `:app:compileDebugKotlin --no-daemon` passed. Local `:app:assembleDebug --no-daemon` passed dan menghasilkan `app/build/outputs/apk/debug/app-debug.apk` ukuran 31,947,389 bytes. Local `:app:bundleRelease --no-daemon` timeout; GitHub Actions `Android Build` run `26960485576` passed untuk patch QA terbaru.
+- **Build**: Local `:app:assembleDebug --no-daemon` passed sebagai sanity check setelah merge renderer. Validasi final patch saat ini diarahkan ke GitHub Actions melalui PR branch. GitHub Actions `Android Build` run `26960485576` passed untuk patch QA sebelumnya.
 - **GitHub Artifacts**: `edit-pdf-online-debug-apk` id `7415251344`, size 31,049,284 bytes, digest `sha256:05bd9d8ad3ac9149bd5fbca8d18120988fc7f32c2dba2b2c0874a4b36b0d3435`; `edit-pdf-online-release-aab` id `7415251939`, size 13,538,659 bytes, digest `sha256:ef96e756c00694127c99f109f4cd44e341dbe0d2354fb2e9e89c5af2b9bc2737`.
 - **Test**: Not run (tidak ada test files ditemukan)
 - **Lint**: Not run
@@ -177,4 +177,4 @@ Berikut adalah milestone berikutnya berdasarkan kondisi saat ini:
 
 ## Resume Note for Next Agent
 
-Aplikasi sudah berhasil menyelesaikan kerangka utamanya (Milestone 1-8 dan 11), plus Milestone 9 Signature, Milestone 10 analytics stub, dan Milestone 14 PDF Tools V1.5 secara implementasi. `SignatureScreen` sudah aktif. `ToolsScreen` menjalankan merge/split/rotate/delete/image-to-pdf/pdf-to-image. Patch QA terbaru memaksa default English, mengaktifkan semua item Settings, memperbaiki validasi PDF SAF, dan berhasil build lokal debug APK serta GitHub APK/AAB artifacts pada run `26960485576`. Lanjut berikutnya: install artifact APK terbaru untuk device QA, lalu lanjut real Firebase/AdMob jika file/ID tersedia.
+Aplikasi sudah berhasil menyelesaikan kerangka utamanya (Milestone 1-8 dan 11), plus Milestone 9 Signature, Milestone 10 analytics stub, dan Milestone 14 PDF Tools V1.5 secara implementasi. `SignatureScreen` sudah aktif. `ToolsScreen` menjalankan merge/split/rotate/delete/image-to-pdf/pdf-to-image. Patch QA terbaru memakai locale device-aware, mengaktifkan semua item Settings, memperbaiki validasi PDF SAF, dan menggabungkan stabilisasi `PdfRendererManager` dari `origin/main`. Lanjut berikutnya: validasi GitHub Actions untuk patch saat ini, install artifact APK terbaru untuk device QA, lalu lanjut real Firebase/AdMob jika file/ID tersedia.

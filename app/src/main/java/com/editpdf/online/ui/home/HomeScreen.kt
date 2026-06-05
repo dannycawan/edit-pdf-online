@@ -14,6 +14,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.CallSplit
+import androidx.compose.material.icons.automirrored.filled.MergeType
+import androidx.compose.material.icons.automirrored.filled.RotateRight
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
@@ -296,9 +299,9 @@ private fun ToolCard(
 @Composable
 private fun PdfToolsGrid(onToolClick: (String) -> Unit) {
     val tools = listOf(
-        Triple(stringResource(R.string.tool_merge_pdf), Icons.Default.MergeType, "merge"),
-        Triple(stringResource(R.string.tool_split_pdf), Icons.Default.CallSplit, "split"),
-        Triple(stringResource(R.string.tool_rotate_pdf), Icons.Default.RotateRight, "rotate"),
+        Triple(stringResource(R.string.tool_merge_pdf), Icons.AutoMirrored.Filled.MergeType, "merge"),
+        Triple(stringResource(R.string.tool_split_pdf), Icons.AutoMirrored.Filled.CallSplit, "split"),
+        Triple(stringResource(R.string.tool_rotate_pdf), Icons.AutoMirrored.Filled.RotateRight, "rotate"),
         Triple(stringResource(R.string.tool_delete_pages), Icons.Default.DeleteForever, "delete_pages"),
         Triple(stringResource(R.string.tool_image_to_pdf), Icons.Default.Image, "image_to_pdf"),
         Triple(stringResource(R.string.tool_pdf_to_image), Icons.Default.PhotoLibrary, "pdf_to_image")

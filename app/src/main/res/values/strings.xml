@@ -170,6 +170,7 @@
     <string name="error_save_signature">Unable to save signature. Please try again.</string>
     <string name="error_export_pdf">Unable to export PDF file. Please try again.</string>
     <string name="error_password_pdf">This PDF may be password-protected</string>
+    <string name="error_file_access_expired">File access expired. Please reopen the file from the file picker.</string>
     <string name="error_large_pdf">This PDF file is too large</string>
     <string name="error_invalid_pdf">This PDF file is invalid or corrupted</string>
     <string name="error_share_pdf">Unable to share PDF file</string>

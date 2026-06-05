@@ -3,7 +3,7 @@
  * Caller: EditorViewModel, EditorScreen
  * Dependencies: Android PdfRenderer, ParcelFileDescriptor
  * Main Functions: openPdf, renderPage, closePdf, getPageCount
- * Side Effects: Opens file descriptors, allocates Bitmaps
+ * Side Effects: Opens file descriptors, allocates Bitmaps, copies PDFs to cache
  */
 package com.editpdf.online.pdf
 
@@ -15,6 +15,7 @@ import android.net.Uri
 import android.os.ParcelFileDescriptor
 import com.editpdf.online.analytics.CrashReporter
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -27,6 +28,7 @@ class PdfRendererManager(private val context: Context) {
     private var pdfRenderer: PdfRenderer? = null
     private var fileDescriptor: ParcelFileDescriptor? = null
     private var currentPage: PdfRenderer.Page? = null
+    private var cachedPdfFile: File? = null
     private val mutex = Mutex()
 
     /**
@@ -37,33 +39,38 @@ class PdfRendererManager(private val context: Context) {
 
     /**
      * Opens a PDF file from the given URI.
-     * Copies the file to a temporary location to avoid SAF file descriptor issues.
-     * Uses retry and fallback strategies for reliability.
-     *
-     * @throws IOException if the file cannot be opened
-     * @throws SecurityException if the PDF is password-protected
+     * Copies the file to a temporary location first, then falls back to direct SAF.
      */
     suspend fun openPdf(uri: Uri): Result<Int> = withContext(Dispatchers.IO) {
         mutex.withLock {
             try {
                 closePdfInternal()
 
-                // Try temp copy approach first (most reliable for PdfRenderer)
-                val tempFile = copyToTempFileWithRetry(uri)
-
-                if (tempFile != null && tempFile.length() > 0) {
-                    val result = openFromFile(tempFile)
-                    if (result != null) return@withContext result
+                if (!canAccessUri(uri)) {
+                    return@withContext Result.failure(
+                        SecurityException("Cannot access the PDF file. The file permission may have expired.")
+                    )
                 }
 
-                // Fallback: try direct SAF file descriptor
+                val tempFile = copyToTempFileWithRetry(uri)
+                if (tempFile != null && tempFile.length() > 0) {
+                    cachedPdfFile = tempFile
+                    val fileResult = openFromFile(tempFile)
+                    if (fileResult != null) {
+                        if (fileResult.isSuccess) return@withContext fileResult
+                        if (fileResult.exceptionOrNull() is SecurityException) return@withContext fileResult
+                    }
+                    closeRendererOnly()
+                }
+
                 val directResult = openFromSafDirect(uri)
                 if (directResult != null) return@withContext directResult
+                closeRendererOnly()
 
-                Result.failure(IOException("Unable to open PDF file. The file may be corrupted or inaccessible."))
+                Result.failure(IOException("Unable to open this PDF. The file may be corrupted, encrypted, or unsupported."))
             } catch (e: SecurityException) {
                 CrashReporter.logError(e, "PdfRendererManager.openPdf SecurityException")
-                Result.failure(SecurityException("PDF may be password-protected"))
+                Result.failure(e)
             } catch (e: IOException) {
                 CrashReporter.logError(e, "PdfRendererManager.openPdf IOException")
                 Result.failure(IOException("Unable to open PDF file: ${e.message}"))
@@ -74,9 +81,21 @@ class PdfRendererManager(private val context: Context) {
         }
     }
 
+    private fun canAccessUri(uri: Uri): Boolean {
+        return try {
+            context.contentResolver.openInputStream(uri)?.use { true } ?: false
+        } catch (e: SecurityException) {
+            CrashReporter.logError(e, "PdfRendererManager.canAccessUri SecurityException")
+            false
+        } catch (e: Exception) {
+            CrashReporter.logError(e, "PdfRendererManager.canAccessUri")
+            false
+        }
+    }
+
     /**
      * Attempts to open a PdfRenderer from a local file.
-     * Returns null if the file is not a valid PDF (rather than assuming password-protection).
+     * Returns null if Android PdfRenderer rejects the file for non-password reasons.
      */
     private fun openFromFile(file: File): Result<Int>? {
         return try {
@@ -87,25 +106,28 @@ class PdfRendererManager(private val context: Context) {
             pdfRenderer = renderer
 
             if (renderer.pageCount == 0) {
+                closeRendererOnly()
                 return Result.failure(IOException("PDF has no pages"))
             }
 
             Result.success(renderer.pageCount)
         } catch (e: SecurityException) {
-            // PdfRenderer throws SecurityException specifically for password-protected PDFs
-            closePdfInternal()
+            CrashReporter.logError(e, "PdfRendererManager.openFromFile SecurityException")
+            closeRendererOnly()
             Result.failure(SecurityException("PDF may be password-protected"))
+        } catch (e: IOException) {
+            CrashReporter.logError(e, "PdfRendererManager.openFromFile IOException")
+            closeRendererOnly()
+            null
         } catch (e: Exception) {
-            // Not a SecurityException → don't assume password-protected, return null to try fallback
             CrashReporter.logError(e, "PdfRendererManager.openFromFile")
-            closePdfInternal()
+            closeRendererOnly()
             null
         }
     }
 
     /**
      * Fallback: open the PDF directly from SAF content resolver file descriptor.
-     * Some SAF providers work fine without temp copy.
      */
     private fun openFromSafDirect(uri: Uri): Result<Int>? {
         return try {
@@ -116,16 +138,22 @@ class PdfRendererManager(private val context: Context) {
             pdfRenderer = renderer
 
             if (renderer.pageCount == 0) {
+                closeRendererOnly()
                 return Result.failure(IOException("PDF has no pages"))
             }
 
             Result.success(renderer.pageCount)
         } catch (e: SecurityException) {
-            closePdfInternal()
+            CrashReporter.logError(e, "PdfRendererManager.openFromSafDirect SecurityException")
+            closeRendererOnly()
             Result.failure(SecurityException("PDF may be password-protected"))
+        } catch (e: IOException) {
+            CrashReporter.logError(e, "PdfRendererManager.openFromSafDirect IOException")
+            closeRendererOnly()
+            Result.failure(IOException("Unable to open PDF file: ${e.message}"))
         } catch (e: Exception) {
             CrashReporter.logError(e, "PdfRendererManager.openFromSafDirect")
-            closePdfInternal()
+            closeRendererOnly()
             null
         }
     }
@@ -146,14 +174,14 @@ class PdfRendererManager(private val context: Context) {
                         return@withContext null
                     }
 
-                    // Close any previously opened page
                     currentPage?.close()
+                    currentPage = null
 
                     val page = renderer.openPage(pageIndex)
                     currentPage = page
 
-                    val width = (page.width * scale).toInt()
-                    val height = (page.height * scale).toInt()
+                    val width = (page.width * scale).toInt().coerceAtLeast(1)
+                    val height = (page.height * scale).toInt().coerceAtLeast(1)
 
                     val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
                     bitmap.eraseColor(Color.WHITE)
@@ -171,6 +199,10 @@ class PdfRendererManager(private val context: Context) {
                     bitmap
                 } catch (e: Exception) {
                     CrashReporter.logError(e, "PdfRendererManager.renderPage($pageIndex)")
+                    try {
+                        currentPage?.close()
+                    } catch (_: Exception) {}
+                    currentPage = null
                     null
                 }
             }
@@ -179,7 +211,7 @@ class PdfRendererManager(private val context: Context) {
     /**
      * Gets the dimensions of a specific page.
      *
-     * @return Pair of (width, height) in points, or null if unavailable
+     * @return Pair of (width, height), or null if unavailable
      */
     suspend fun getPageDimensions(pageIndex: Int): Pair<Int, Int>? =
         withContext(Dispatchers.IO) {
@@ -191,6 +223,8 @@ class PdfRendererManager(private val context: Context) {
                     }
 
                     currentPage?.close()
+                    currentPage = null
+
                     val page = renderer.openPage(pageIndex)
                     val dimensions = Pair(page.width, page.height)
                     page.close()
@@ -199,6 +233,10 @@ class PdfRendererManager(private val context: Context) {
                     dimensions
                 } catch (e: Exception) {
                     CrashReporter.logError(e, "PdfRendererManager.getPageDimensions($pageIndex)")
+                    try {
+                        currentPage?.close()
+                    } catch (_: Exception) {}
+                    currentPage = null
                     null
                 }
             }
@@ -214,6 +252,14 @@ class PdfRendererManager(private val context: Context) {
     }
 
     private fun closePdfInternal() {
+        closeRendererOnly()
+        try {
+            cachedPdfFile?.delete()
+        } catch (_: Exception) {}
+        cachedPdfFile = null
+    }
+
+    private fun closeRendererOnly() {
         try {
             currentPage?.close()
         } catch (_: Exception) {}
@@ -233,14 +279,12 @@ class PdfRendererManager(private val context: Context) {
     /**
      * Copies a SAF URI file to a temporary file with retry for SAF flakiness.
      * Verifies the copy was successful by checking file size.
-     * Returns null if copy fails after retries.
      */
-    private fun copyToTempFileWithRetry(uri: Uri, maxAttempts: Int = 2): File? {
+    private suspend fun copyToTempFileWithRetry(uri: Uri, maxAttempts: Int = 3): File? {
         for (attempt in 1..maxAttempts) {
             try {
-                val tempFile = File(context.cacheDir, "temp_pdf_${System.currentTimeMillis()}.pdf")
-                val inputStream = context.contentResolver.openInputStream(uri)
-                    ?: continue
+                val tempFile = File(context.cacheDir, "temp_pdf_${System.currentTimeMillis()}_$attempt.pdf")
+                val inputStream = context.contentResolver.openInputStream(uri) ?: continue
 
                 inputStream.use { input ->
                     FileOutputStream(tempFile).use { output ->
@@ -248,29 +292,30 @@ class PdfRendererManager(private val context: Context) {
                     }
                 }
 
-                // Verify the copy was successful
                 if (tempFile.exists() && tempFile.length() > 0) {
                     return tempFile
-                } else {
-                    tempFile.delete()
-                    CrashReporter.logMessage("PDF temp copy empty on attempt $attempt")
                 }
+
+                tempFile.delete()
+                CrashReporter.logMessage("PDF temp copy empty on attempt $attempt")
+            } catch (e: SecurityException) {
+                CrashReporter.logError(e, "PdfRendererManager.copyToTempFile SecurityException on attempt $attempt")
+                return null
             } catch (e: Exception) {
                 CrashReporter.logError(e, "PdfRendererManager.copyToTempFile attempt $attempt")
-                // Continue to next attempt
+                if (attempt < maxAttempts) {
+                    delay(200L * attempt)
+                }
             }
         }
         return null
     }
 
-    /**
-     * Cleans up temporary PDF files in cache directory.
-     */
     suspend fun cleanupTempFiles() = withContext(Dispatchers.IO) {
         try {
-            context.cacheDir.listFiles()?.filter {
-                it.name.startsWith("temp_pdf_") && it.name.endsWith(".pdf")
-            }?.forEach { it.delete() }
+            context.cacheDir.listFiles()
+                ?.filter { it.name.startsWith("temp_pdf_") && it.name.endsWith(".pdf") }
+                ?.forEach { it.delete() }
         } catch (_: Exception) {}
     }
 }

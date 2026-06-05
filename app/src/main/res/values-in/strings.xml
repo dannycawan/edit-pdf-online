@@ -170,6 +170,7 @@
     <string name="error_save_signature">Tidak dapat menyimpan tanda tangan. Silakan coba lagi.</string>
     <string name="error_export_pdf">Tidak dapat mengekspor file PDF. Silakan coba lagi.</string>
     <string name="error_password_pdf">PDF ini mungkin dilindungi kata sandi</string>
+    <string name="error_file_access_expired">Akses file telah kedaluwarsa. Silakan buka kembali file dari pemilih file.</string>
     <string name="error_large_pdf">Ukuran file PDF terlalu besar</string>
     <string name="error_invalid_pdf">File PDF tidak valid atau rusak</string>
     <string name="error_share_pdf">Tidak dapat membagikan file PDF</string>

@@ -19,6 +19,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.CallSplit
+import androidx.compose.material.icons.automirrored.filled.MergeType
+import androidx.compose.material.icons.automirrored.filled.RotateRight
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -279,7 +282,7 @@ private fun PdfToolsGrid(onToolClick: (String) -> Unit) {
             CompactToolCard(
                 modifier = Modifier.weight(1f),
                 title = stringResource(R.string.tool_merge_pdf),
-                icon = Icons.Default.MergeType,
+                icon = Icons.AutoMirrored.Filled.MergeType,
                 iconTint = SecondaryBlue,
                 bgColor = CardBlue,
                 onClick = { onToolClick("merge") }
@@ -287,7 +290,7 @@ private fun PdfToolsGrid(onToolClick: (String) -> Unit) {
             CompactToolCard(
                 modifier = Modifier.weight(1f),
                 title = stringResource(R.string.tool_split_pdf),
-                icon = Icons.Default.CallSplit,
+                icon = Icons.AutoMirrored.Filled.CallSplit,
                 iconTint = TertiaryTeal,
                 bgColor = CardTeal,
                 onClick = { onToolClick("split") }
@@ -295,7 +298,7 @@ private fun PdfToolsGrid(onToolClick: (String) -> Unit) {
             CompactToolCard(
                 modifier = Modifier.weight(1f),
                 title = stringResource(R.string.tool_rotate_pdf),
-                icon = Icons.Default.RotateRight,
+                icon = Icons.AutoMirrored.Filled.RotateRight,
                 iconTint = WarningYellow,
                 bgColor = CardOrange,
                 onClick = { onToolClick("rotate") }

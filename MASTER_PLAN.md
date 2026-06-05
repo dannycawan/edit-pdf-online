@@ -1,5 +1,5 @@
 # MASTER_PLAN.md — Edit PDF Online - Text Editor
-> Terakhir diperbarui: 2026-06-04
+> Terakhir diperbarui: 2026-06-05
 
 Dokumen ini adalah acuan utama (master plan) pengembangan aplikasi berdasarkan **IMPLEMENTATION ORDER** dari spesifikasi produk. Centang checklist saat setiap sub-task selesai.
 
@@ -134,11 +134,11 @@ Dokumen ini adalah acuan utama (master plan) pengembangan aplikasi berdasarkan *
 - [x] Interstitial only after successful tool completion and frequency cap.
 
 ## Milestone 15: Final Polish 🔄 (In Progress)
-- [x] Build debug APK and release AAB on GitHub Actions (latest run `26960485576` passed).
-- [x] Build debug APK locally after QA fixes (`:app:assembleDebug` passed).
+- [x] Build debug APK and release AAB on GitHub Actions (latest completed run `26960485576` passed; current PR validation will rerun on GitHub).
+- [x] Merge latest `origin/main` PdfRenderer stabilization and keep SAF access error handling.
 - [x] Improve UI spacing (tools UI updated).
 - [x] Improve error messages (tools flow messages added/localized; editor invalid/open/export errors use resource strings).
-- [x] Test localization (English is forced as default app locale; Indonesian resources kept as fallback).
+- [x] Test localization (Indonesian devices use Bahasa Indonesia; all other locales use English).
 - [x] Connect Settings menu actions (Language, Theme, Help, Privacy, Terms now open dialogs).
 - [x] Improve PDF open reliability (SAF read permission persisted; PDF validation accepts reliable header or picker metadata).
 - [x] Test export quality (needs device/runtime QA with real PDFs).

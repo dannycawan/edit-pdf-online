@@ -1,5 +1,5 @@
 # SYSTEM_MAP.md — Edit PDF Online - Text Editor
-> Terakhir diperbarui: 2026-06-04
+> Terakhir diperbarui: 2026-06-05
 
 ---
 
@@ -243,7 +243,7 @@ edit pdf online/
 | File | Fungsi/Class Utama | Peran |
 |------|-------------------|-------|
 | `FileUtils.kt` | `getFileName()`, `getFileSize()`, `generateOutputFileName()`, `createTempOutputFile()`, `isPdfFile()`, `isFileTooLarge()` | Utility SAF file operations; validasi PDF memakai header atau metadata picker |
-| `LocaleUtils.kt` | `forceEnglish()` | Memaksa default runtime locale aplikasi ke English |
+| `LocaleUtils.kt` | `applyAppLocale()` | Menggunakan Bahasa Indonesia untuk device locale ID dan English untuk locale lain |
 | `ShareUtils.kt` | `sharePdf()`, `sharePdfUri()` | Share PDF via Android Intent/FileProvider |
 
 ---
@@ -303,7 +303,7 @@ edit pdf online/
 ## Risks / Blind Spots
 
 1. **Firebase belum dikonfigurasi** — semua Firebase dependencies di-comment; `google-services.json` belum ada.
-2. **Local Android SDK warning** — `:app:assembleDebug` sudah berhasil pada 2026-06-04, tetapi Gradle masih mencetak warning NDK `source.properties` hilang di `C:\Users\User\AppData\Local\Android\Sdk\ndk\27.0.12077973`.
+2. **Local Android SDK warning** — `:app:assembleDebug` sudah berhasil pada 2026-06-05, tetapi Gradle masih dapat mencetak warning NDK `source.properties` hilang di `C:\Users\User\AppData\Local\Android\Sdk\ndk\27.0.12077973`.
 3. **DataStore Preferences** ada di dependency tapi belum digunakan secara aktif (saat ini Room yang dipakai untuk recent files).
 4. **Coil Compose** ada di dependency tapi belum digunakan (disiapkan untuk load signature PNG).
 5. **ProGuard rules** hanya komentar default — belum ada rules untuk PdfBox-Android atau AdMob.
