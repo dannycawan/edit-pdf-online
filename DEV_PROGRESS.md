@@ -9,14 +9,14 @@ Memperbaiki alur Editor agar tombol Home/Main Tools dan Recent Files selalu mema
 
 ## Current Status
 
-- **Status**: Fresh picker fix selesai secara lokal dan `clean assembleDebug` berhasil. Push serta validasi GitHub Actions untuk patch ini masih pending.
+- **Status**: Fresh picker fix selesai, local `clean assembleDebug` berhasil, dan GitHub Actions APK/AAB terbaru sukses.
 - **Editor UI & Logic (Milestone 2-8)**: Selesai. Pengguna bisa membuka PDF, menambah overlay teks, blok penutup (cover), mengganti teks, membuat checkmark, dan menyimpannya (export via PdfBox). 
 - **Layar Dukungan**: `HomeScreen`, `RecentFilesScreen`, `ToolsScreen`, dan `SettingsScreen` sudah diimplementasikan beserta ViewModel (Recent files menggunakan Room Database).
 - **Navigation**: Seluruh rute sudah terhubung (`AppNavigation.kt`) menggunakan Compose Navigation dan SAF Picker terintegrasi.
 - **Masalah Utama Lokal**: Editor sebelumnya dapat menerima URI lama langsung dari recent files dan menampilkan error akses file kedaluwarsa. Jalur tersebut sekarang membuka PDF picker ulang.
 - **Lokalisasi & Strings**: Locale kini deteksi device (Bahasa Indonesia untuk ID, English untuk lainnya). Semua string hardcoded di UI telah dipindahkan ke `strings.xml` (EN & ID).
 - **Analytics & Crashlytics**: Fungsi stub kini terhubung pada event kunci (open PDF, export PDF, errors).
-- **GitHub Build**: Run `27015876147` adalah build sukses terakhir sebelum fresh picker patch. Patch saat ini menunggu push dan validasi GitHub Actions baru.
+- **GitHub Build**: `Android Build` run `27085606975` berhasil pada branch `main` untuk fresh picker patch; debug APK dan release AAB terbaru sudah diupload.
 - **Blocked Eksternal**: Firebase real setup membutuhkan `google-services.json`; AdMob production test membutuhkan production ad unit/app IDs.
 
 ## What Has Been Confirmed
@@ -53,13 +53,13 @@ Memperbaiki alur Editor agar tombol Home/Main Tools dan Recent Files selalu mema
 - [x] Hubungkan stub Analytics, Crashlytics, dan Interstitial Ad pada event utama.
 - [x] Build lokal sukses.
 - [x] Force push local `main` ke `origin/main` pada commit `664d6c6`.
-- [x] GitHub Actions push-to-main sukses (`Android Build` run `27015876147`).
+- [x] GitHub Actions push-to-main sukses (`Android Build` run `27085606975`).
 - [x] Fix expired recent URI hanya di `AppNavigation.kt`.
 - [x] Local `clean assembleDebug` sukses setelah fresh picker fix.
 
 ## In Progress
 
-- Push fresh picker patch dan tunggu build APK/AAB terbaru di GitHub Actions.
+- Device QA fresh picker menggunakan APK artifact terbaru dari GitHub Actions.
 - Sisa pekerjaan real Firebase/AdMob membutuhkan file/ID eksternal.
 
 ## Next Exact Steps
@@ -171,8 +171,8 @@ Berikut adalah milestone berikutnya berdasarkan kondisi saat ini:
 
 ## Validation Status
 
-- **Build**: Local `clean assembleDebug` passed setelah fresh picker fix. GitHub Actions patch saat ini masih pending.
-- **GitHub Artifacts**: `edit-pdf-online-debug-apk` id `7437022247`, size 31,054,177 bytes, digest `sha256:46d310231d5725216d18014b13a5fe382283e750eb9c5feff230ed0cbd8c43ad`; `edit-pdf-online-release-aab` id `7437022746`, size 13,549,587 bytes, digest `sha256:cef0a9e8bb43473372dae018f16b067167fcff83e0a638c8700823932321b697`.
+- **Build**: Local `clean assembleDebug` passed. GitHub Actions `Android Build` run `27085606975` pada commit `cd567f8` juga passed; build debug APK, release AAB, dan kedua upload artifact semuanya `success`.
+- **GitHub Artifacts**: `edit-pdf-online-debug-apk` id `7461740645`, size 31,054,416 bytes, digest `sha256:c28e98a1fc50e1ef7ce08bca1cb9ff621823851ec48f574540fc5c4efbcc58dc`; `edit-pdf-online-release-aab` id `7461740973`, size 13,548,966 bytes, digest `sha256:0cf37137fe6b863451f63a6ad4708da08d2bc813196d642dc52e9c73b338f3dd`.
 - **Test**: Not run (tidak ada test files ditemukan)
 - **Lint**: Not run
 - **Manual Check**: Passed untuk static wiring: tidak ada `onClick = {}` kosong tersisa di source `ui`, Settings menu sudah punya dialog, PDF picker now persists read permission.
@@ -184,4 +184,4 @@ Berikut adalah milestone berikutnya berdasarkan kondisi saat ini:
 
 ## Resume Note for Next Agent
 
-Aplikasi sudah menyelesaikan fresh picker fix di `AppNavigation.kt`. Home hero, Main Tools, recent list di Home, dan layar Recent Files tidak lagi membuka URI database secara langsung; semua meminta user memilih PDF baru sebelum masuk Editor. PDF Tools dan renderer tidak disentuh. Local `clean assembleDebug` sukses. Lanjut berikutnya: push patch, tunggu GitHub Actions APK/AAB sukses, lalu install artifact terbaru untuk device QA.
+Aplikasi sudah menyelesaikan fresh picker fix di `AppNavigation.kt`. Home hero, Main Tools, recent list di Home, dan layar Recent Files tidak lagi membuka URI database secara langsung; semua meminta user memilih PDF baru sebelum masuk Editor. PDF Tools dan renderer tidak disentuh. Local `clean assembleDebug` dan GitHub Actions run `27085606975` sukses. Lanjut berikutnya: install APK artifact `7461740645` untuk device QA.

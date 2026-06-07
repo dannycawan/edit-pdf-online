@@ -134,14 +134,14 @@ Dokumen ini adalah acuan utama (master plan) pengembangan aplikasi berdasarkan *
 - [x] Interstitial only after successful tool completion and frequency cap.
 
 ## Milestone 15: Final Polish 🔄 (In Progress)
-- [x] Build debug APK and release AAB on GitHub Actions after docs update on `main` (latest run `27015876147` passed).
+- [x] Build debug APK and release AAB on GitHub Actions after fresh picker fix on `main` (latest run `27085606975` passed).
 - [x] Merge latest `origin/main` PdfRenderer stabilization and keep SAF access error handling.
 - [x] Force push local `main` to `origin/main` at commit `664d6c6`.
-- [x] Upload latest GitHub artifacts: APK id `7437022247`, AAB id `7437022746`.
+- [x] Upload latest GitHub artifacts: APK id `7461740645`, AAB id `7461740973`.
 - [x] Route Home hero, Main Tools, Home recent items, and Recent Files through a fresh `OpenDocument` PDF picker before opening Editor.
 - [x] Keep PDF Tools, `ToolsScreen`, `ToolsViewModel`, `PdfRendererManager`, Gradle, export, and conversion flows unchanged.
 - [x] Run local `clean assembleDebug` after the fresh picker fix (`BUILD SUCCESSFUL`).
-- [ ] Validate the fresh picker patch and upload new APK/AAB artifacts through GitHub Actions.
+- [x] Validate the fresh picker patch and upload new APK/AAB artifacts through GitHub Actions.
 - [x] Improve UI spacing (tools UI updated).
 - [x] Improve error messages (tools flow messages added/localized; editor invalid/open/export errors use resource strings).
 - [x] Test localization (Indonesian devices use Bahasa Indonesia; all other locales use English).
