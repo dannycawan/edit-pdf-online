@@ -1,5 +1,5 @@
 # MASTER_PLAN.md — Edit PDF Online - Text Editor
-> Terakhir diperbarui: 2026-06-05
+> Terakhir diperbarui: 2026-06-07
 
 Dokumen ini adalah acuan utama (master plan) pengembangan aplikasi berdasarkan **IMPLEMENTATION ORDER** dari spesifikasi produk. Centang checklist saat setiap sub-task selesai.
 
@@ -101,7 +101,7 @@ Dokumen ini adalah acuan utama (master plan) pengembangan aplikasi berdasarkan *
 ## Milestone 11: Recent Files ✅
 - [x] Store recent files using DataStore or Room.
 - [x] Show recent files (HomeScreen & RecentFilesScreen).
-- [x] Allow quick open.
+- [x] Reopen the system PDF picker when a recent item is tapped so Editor never receives an expired stored URI.
 - [x] Allow removing from recent list.
 
 ## Milestone 12: Firebase Free Setup 🔒 (Blocked: external config needed)
@@ -138,6 +138,10 @@ Dokumen ini adalah acuan utama (master plan) pengembangan aplikasi berdasarkan *
 - [x] Merge latest `origin/main` PdfRenderer stabilization and keep SAF access error handling.
 - [x] Force push local `main` to `origin/main` at commit `664d6c6`.
 - [x] Upload latest GitHub artifacts: APK id `7437022247`, AAB id `7437022746`.
+- [x] Route Home hero, Main Tools, Home recent items, and Recent Files through a fresh `OpenDocument` PDF picker before opening Editor.
+- [x] Keep PDF Tools, `ToolsScreen`, `ToolsViewModel`, `PdfRendererManager`, Gradle, export, and conversion flows unchanged.
+- [x] Run local `clean assembleDebug` after the fresh picker fix (`BUILD SUCCESSFUL`).
+- [ ] Validate the fresh picker patch and upload new APK/AAB artifacts through GitHub Actions.
 - [x] Improve UI spacing (tools UI updated).
 - [x] Improve error messages (tools flow messages added/localized; editor invalid/open/export errors use resource strings).
 - [x] Test localization (Indonesian devices use Bahasa Indonesia; all other locales use English).

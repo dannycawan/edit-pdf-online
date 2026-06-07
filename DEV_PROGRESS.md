@@ -1,22 +1,22 @@
 # DEV_PROGRESS.md — Edit PDF Online - Text Editor
-> Terakhir diperbarui: 2026-06-05
+> Terakhir diperbarui: 2026-06-07
 
 ---
 
 ## Active Task
 
-Menutup patch QA renderer/lokalisasi: local `main` sudah dipaksa ke `origin/main`, dan GitHub Actions push-to-main sudah sukses membuat APK/AAB terbaru.
+Memperbaiki alur Editor agar tombol Home/Main Tools dan Recent Files selalu memakai URI baru dari system PDF picker, bukan URI recent lama yang dapat kedaluwarsa.
 
 ## Current Status
 
-- **Status**: Partially Completed; core editor, Signature, Fill Form analytics stub, PDF Tools V1.5, Settings action dialogs, device-aware locale, renderer stabilization, dan force push ke `origin/main` sudah selesai.
+- **Status**: Fresh picker fix selesai secara lokal dan `clean assembleDebug` berhasil. Push serta validasi GitHub Actions untuk patch ini masih pending.
 - **Editor UI & Logic (Milestone 2-8)**: Selesai. Pengguna bisa membuka PDF, menambah overlay teks, blok penutup (cover), mengganti teks, membuat checkmark, dan menyimpannya (export via PdfBox). 
 - **Layar Dukungan**: `HomeScreen`, `RecentFilesScreen`, `ToolsScreen`, dan `SettingsScreen` sudah diimplementasikan beserta ViewModel (Recent files menggunakan Room Database).
 - **Navigation**: Seluruh rute sudah terhubung (`AppNavigation.kt`) menggunakan Compose Navigation dan SAF Picker terintegrasi.
-- **Masalah Utama Lokal**: Build APK berhasil. Warning NDK `source.properties` hilang bukan blocker. Error "password-protected" palsu sudah diperbaiki (PdfRenderer fallback ke direct FD dan integrity check temp file).
+- **Masalah Utama Lokal**: Editor sebelumnya dapat menerima URI lama langsung dari recent files dan menampilkan error akses file kedaluwarsa. Jalur tersebut sekarang membuka PDF picker ulang.
 - **Lokalisasi & Strings**: Locale kini deteksi device (Bahasa Indonesia untuk ID, English untuk lainnya). Semua string hardcoded di UI telah dipindahkan ke `strings.xml` (EN & ID).
 - **Analytics & Crashlytics**: Fungsi stub kini terhubung pada event kunci (open PDF, export PDF, errors).
-- **GitHub Build**: GitHub Actions `Android Build` run `27015876147` berhasil pada branch `main` setelah update dokumentasi; debug APK dan release AAB terbaru sudah diupload sebagai artifacts.
+- **GitHub Build**: Run `27015876147` adalah build sukses terakhir sebelum fresh picker patch. Patch saat ini menunggu push dan validasi GitHub Actions baru.
 - **Blocked Eksternal**: Firebase real setup membutuhkan `google-services.json`; AdMob production test membutuhkan production ad unit/app IDs.
 
 ## What Has Been Confirmed
@@ -31,6 +31,8 @@ Menutup patch QA renderer/lokalisasi: local `main` sudah dipaksa ke `origin/main
 8. **PDF Open Reliability**: Error "password-protected" palsu sudah ditangani dengan retry copy temp file, integrity check (size > 0), dan fallback langsung menggunakan SAF file descriptor.
 9. **UI Strings**: Lebih dari 20 teks hardcoded telah diganti menggunakan resource `strings.xml`.
 10. **Connected Functions**: CrashReporter dan AnalyticsTracker kini dipanggil saat error, open PDF, dan export PDF. Interstitial ad terhubung dengan frequency manager setelah export sukses.
+11. **Fresh Editor URI**: Home hero, Main Tools, recent list di Home, dan `RecentFilesScreen` membuka `ActivityResultContracts.OpenDocument()` dengan MIME `application/pdf` sebelum navigasi ke Editor.
+12. **Scope Guard**: PDF Tools, renderer, Gradle, export/save, dan conversion flow tidak diubah.
 
 ## Work Completed
 
@@ -52,10 +54,12 @@ Menutup patch QA renderer/lokalisasi: local `main` sudah dipaksa ke `origin/main
 - [x] Build lokal sukses.
 - [x] Force push local `main` ke `origin/main` pada commit `664d6c6`.
 - [x] GitHub Actions push-to-main sukses (`Android Build` run `27015876147`).
+- [x] Fix expired recent URI hanya di `AppNavigation.kt`.
+- [x] Local `clean assembleDebug` sukses setelah fresh picker fix.
 
 ## In Progress
 
-- Build APK/AAB patch QA terbaru sudah sukses di GitHub Actions pada branch `main`.
+- Push fresh picker patch dan tunggu build APK/AAB terbaru di GitHub Actions.
 - Sisa pekerjaan real Firebase/AdMob membutuhkan file/ID eksternal.
 
 ## Next Exact Steps
@@ -115,6 +119,7 @@ Berikut adalah milestone berikutnya berdasarkan kondisi saat ini:
 | `SYSTEM_MAP.md` | Baru dibuat — peta arsitektur lengkap |
 | `DEV_PROGRESS.md` | Baru dibuat — catatan progres pengembangan |
 | `MASTER_PLAN.md` | Update status Milestone 9, Milestone 10, renderer stabilization, force push main, dan validasi GitHub |
+| `AppNavigation.kt` | Home/Main Tools dan Recent Files selalu memilih PDF baru sebelum membuka Editor; persist permission dibuat toleran terhadap provider non-persisten |
 | `AppNavigation.kt` | Route SignatureScreen aktif dan return signature path via SavedStateHandle |
 | `EditorScreen.kt` | Menerima signature path dan navigasi dari tool Sign |
 | `EditorViewModel.kt` | Simpan pending tap, place signature, analytics tool selection |
@@ -166,7 +171,7 @@ Berikut adalah milestone berikutnya berdasarkan kondisi saat ini:
 
 ## Validation Status
 
-- **Build**: GitHub Actions `Android Build` run `27015876147` passed pada branch `main` setelah update dokumentasi commit `1465c8f`. Step `Build debug APK`, `Build release AAB`, `Upload APK`, dan `Upload AAB` semuanya `success`.
+- **Build**: Local `clean assembleDebug` passed setelah fresh picker fix. GitHub Actions patch saat ini masih pending.
 - **GitHub Artifacts**: `edit-pdf-online-debug-apk` id `7437022247`, size 31,054,177 bytes, digest `sha256:46d310231d5725216d18014b13a5fe382283e750eb9c5feff230ed0cbd8c43ad`; `edit-pdf-online-release-aab` id `7437022746`, size 13,549,587 bytes, digest `sha256:cef0a9e8bb43473372dae018f16b067167fcff83e0a638c8700823932321b697`.
 - **Test**: Not run (tidak ada test files ditemukan)
 - **Lint**: Not run
@@ -179,4 +184,4 @@ Berikut adalah milestone berikutnya berdasarkan kondisi saat ini:
 
 ## Resume Note for Next Agent
 
-Aplikasi sudah berhasil menyelesaikan kerangka utamanya (Milestone 1-8 dan 11), plus Milestone 9 Signature, Milestone 10 analytics stub, dan Milestone 14 PDF Tools V1.5 secara implementasi. `SignatureScreen` sudah aktif. `ToolsScreen` menjalankan merge/split/rotate/delete/image-to-pdf/pdf-to-image. Patch QA terbaru memakai locale device-aware, mengaktifkan semua item Settings, memperbaiki validasi PDF SAF, dan menggabungkan stabilisasi `PdfRendererManager` dari `origin/main`. Local `main` sudah dipaksa ke `origin/main` pada commit `664d6c6`; GitHub Actions run `27015876147` sukses dan artifact APK/AAB terbaru tersedia. Lanjut berikutnya: install artifact APK terbaru untuk device QA, lalu lanjut real Firebase/AdMob jika file/ID tersedia.
+Aplikasi sudah menyelesaikan fresh picker fix di `AppNavigation.kt`. Home hero, Main Tools, recent list di Home, dan layar Recent Files tidak lagi membuka URI database secara langsung; semua meminta user memilih PDF baru sebelum masuk Editor. PDF Tools dan renderer tidak disentuh. Local `clean assembleDebug` sukses. Lanjut berikutnya: push patch, tunggu GitHub Actions APK/AAB sukses, lalu install artifact terbaru untuk device QA.

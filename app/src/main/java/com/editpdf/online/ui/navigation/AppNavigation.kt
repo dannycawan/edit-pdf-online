@@ -74,8 +74,8 @@ fun AppNavigation() {
                 onOpenPdf = {
                     filePickerLauncher.launch(arrayOf("application/pdf"))
                 },
-                onNavigateToEditor = { uri ->
-                    navController.navigate(Routes.editorRoute(uri))
+                onNavigateToEditor = {
+                    filePickerLauncher.launch(arrayOf("application/pdf"))
                 },
                 onNavigateToTools = {
                     navController.navigate(Routes.TOOLS)
@@ -127,10 +127,19 @@ fun AppNavigation() {
         }
 
         composable(Routes.RECENT_FILES) {
+            val recentFilePickerLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.OpenDocument()
+            ) { uri: Uri? ->
+                uri?.let {
+                    persistReadPermission(context, it)
+                    navController.navigate(Routes.editorRoute(it.toString()))
+                }
+            }
+
             RecentFilesScreen(
                 onNavigateBack = { navController.popBackStack() },
-                onOpenFile = { fileUri ->
-                    navController.navigate(Routes.editorRoute(fileUri))
+                onOpenFile = {
+                    recentFilePickerLauncher.launch(arrayOf("application/pdf"))
                 },
                 viewModel = homeViewModel
             )
@@ -179,6 +188,10 @@ private fun persistReadPermission(context: Context, uri: Uri) {
             Intent.FLAG_GRANT_READ_URI_PERMISSION
         )
     } catch (_: SecurityException) {
-        // Some providers grant only one-shot access; immediate editor opening still works.
+        // Some providers only grant temporary access.
+    } catch (_: IllegalArgumentException) {
+        // Some providers do not support persistable permissions.
+    } catch (_: Exception) {
+        // Keep editor flow working even if persist permission fails.
     }
 }

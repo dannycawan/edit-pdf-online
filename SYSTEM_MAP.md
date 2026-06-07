@@ -1,5 +1,5 @@
 # SYSTEM_MAP.md — Edit PDF Online - Text Editor
-> Terakhir diperbarui: 2026-06-05
+> Terakhir diperbarui: 2026-06-07
 
 ---
 
@@ -84,11 +84,13 @@ User pilih Image to PDF / PDF to Image (ToolsScreen)
 
 ### Flow 4: Recent Files
 ```
-User membuka file
-  -> RecentFileRepository.addOrUpdateRecentFile(...)
-    -> RecentFileDao.getRecentFileByUri(uri) // cek existing
-    -> RecentFileDao.insertRecentFile / updateRecentFile
-  -> HomeScreen: Menampilkan daftar file (dari HomeViewModel.recentFiles)
+HomeScreen / RecentFilesScreen menampilkan metadata recent dari Room
+  -> User tap recent item
+    -> AppNavigation membuka ActivityResultContracts.OpenDocument()
+      -> User memilih PDF baru
+        -> persistReadPermission(context, uri)
+        -> Routes.editorRoute(uri.toString())
+        -> EditorScreen menerima URI fresh
 ```
 
 ### Flow 5: Interstitial Ad
@@ -246,6 +248,13 @@ edit pdf online/
 | `LocaleUtils.kt` | `applyAppLocale()` | Menggunakan Bahasa Indonesia untuk device locale ID dan English untuk locale lain |
 | `ShareUtils.kt` | `sharePdf()`, `sharePdfUri()` | Share PDF via Android Intent/FileProvider |
 
+### Editor File Picker Policy
+
+- Home hero dan semua Main Tools memakai satu launcher `OpenDocument` dengan MIME `application/pdf`.
+- Recent item di Home dan `RecentFilesScreen` membuka picker ulang; URI yang tersimpan hanya menjadi metadata recent dan tidak dipakai langsung untuk membuka Editor.
+- `persistReadPermission()` mengabaikan provider yang hanya memberi akses sementara atau tidak mendukung permission persisten.
+- PDF Tools tetap memakai flow miliknya sendiri dan tidak diubah oleh patch ini.
+
 ---
 
 ## Data & Config
@@ -303,6 +312,7 @@ edit pdf online/
 - **Remote utama**: `origin/main` sudah mengikuti commit lokal `664d6c6` setelah force push.
 - **GitHub Actions**: `Android Build` run `27015876147` pada branch `main` selesai `success`.
 - **Artifacts terbaru**: APK `edit-pdf-online-debug-apk` id `7437022247`; AAB `edit-pdf-online-release-aab` id `7437022746`.
+- **Fresh picker patch**: Local `clean assembleDebug` sukses; GitHub Actions baru menunggu push.
 
 ---
 
