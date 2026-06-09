@@ -39,19 +39,16 @@ class PdfRendererManager(private val context: Context) {
 
     /**
      * Opens a PDF file from the given URI.
-     * Copies the file to a temporary location first, then falls back to direct SAF.
+     * Tries to copy to a temp file first (most reliable), then falls back to direct SAF FD.
+     * Does NOT do an upfront canAccessUri() check — that check itself can fail spuriously
+     * right after the SAF picker returns, causing false "expired" errors.
      */
     suspend fun openPdf(uri: Uri): Result<Int> = withContext(Dispatchers.IO) {
         mutex.withLock {
             try {
                 closePdfInternal()
 
-                if (!canAccessUri(uri)) {
-                    return@withContext Result.failure(
-                        SecurityException("Cannot access the PDF file. The file permission may have expired.")
-                    )
-                }
-
+                // Strategy 1: copy to temp file and open from local file
                 val tempFile = copyToTempFileWithRetry(uri)
                 if (tempFile != null && tempFile.length() > 0) {
                     cachedPdfFile = tempFile
@@ -63,6 +60,7 @@ class PdfRendererManager(private val context: Context) {
                     closeRendererOnly()
                 }
 
+                // Strategy 2: open directly via SAF file descriptor
                 val directResult = openFromSafDirect(uri)
                 if (directResult != null) return@withContext directResult
                 closeRendererOnly()
@@ -78,18 +76,6 @@ class PdfRendererManager(private val context: Context) {
                 CrashReporter.logError(e, "PdfRendererManager.openPdf")
                 Result.failure(Exception("Unable to open PDF file: ${e.message}"))
             }
-        }
-    }
-
-    private fun canAccessUri(uri: Uri): Boolean {
-        return try {
-            context.contentResolver.openInputStream(uri)?.use { true } ?: false
-        } catch (e: SecurityException) {
-            CrashReporter.logError(e, "PdfRendererManager.canAccessUri SecurityException")
-            false
-        } catch (e: Exception) {
-            CrashReporter.logError(e, "PdfRendererManager.canAccessUri")
-            false
         }
     }
 
@@ -278,33 +264,46 @@ class PdfRendererManager(private val context: Context) {
 
     /**
      * Copies a SAF URI file to a temporary file with retry for SAF flakiness.
+     * A short initial delay is used because on some devices the SAF provider needs
+     * a moment after the picker result before the URI becomes fully readable.
      * Verifies the copy was successful by checking file size.
      */
     private suspend fun copyToTempFileWithRetry(uri: Uri, maxAttempts: Int = 3): File? {
         for (attempt in 1..maxAttempts) {
             try {
+                // Give the SAF provider a moment to settle on first attempt
+                if (attempt == 1) delay(100L)
+
                 val tempFile = File(context.cacheDir, "temp_pdf_${System.currentTimeMillis()}_$attempt.pdf")
-                val inputStream = context.contentResolver.openInputStream(uri) ?: continue
-
-                inputStream.use { input ->
-                    FileOutputStream(tempFile).use { output ->
-                        input.copyTo(output)
+                val inputStream = context.contentResolver.openInputStream(uri)
+                if (inputStream == null) {
+                    delay(300L * attempt)
+                } else {
+                    inputStream.use { input ->
+                        FileOutputStream(tempFile).use { output ->
+                            input.copyTo(output)
+                        }
                     }
-                }
 
-                if (tempFile.exists() && tempFile.length() > 0) {
-                    return tempFile
-                }
+                    if (tempFile.exists() && tempFile.length() > 0) {
+                        return tempFile
+                    }
 
-                tempFile.delete()
-                CrashReporter.logMessage("PDF temp copy empty on attempt $attempt")
+                    tempFile.delete()
+                    CrashReporter.logMessage("PDF temp copy empty on attempt $attempt")
+                    delay(300L * attempt)
+                }
             } catch (e: SecurityException) {
                 CrashReporter.logError(e, "PdfRendererManager.copyToTempFile SecurityException on attempt $attempt")
-                return null
+                if (attempt < maxAttempts) {
+                    delay(500L * attempt)
+                } else {
+                    return null
+                }
             } catch (e: Exception) {
                 CrashReporter.logError(e, "PdfRendererManager.copyToTempFile attempt $attempt")
                 if (attempt < maxAttempts) {
-                    delay(200L * attempt)
+                    delay(300L * attempt)
                 }
             }
         }

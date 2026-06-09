@@ -70,19 +70,15 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, errorMessage = null) }
 
-            val fileName = FileUtils.getFileName(context, uri)
-            val fileSize = FileUtils.getFileSize(context, uri)
+            // Collect metadata without blocking on failures — SAF metadata can be
+            // unavailable immediately after the picker returns on some devices/providers.
+            val fileName = try { FileUtils.getFileName(context, uri) } catch (_: Exception) { "document.pdf" }
+            val fileSize = try { FileUtils.getFileSize(context, uri) } catch (_: Exception) { 0L }
 
-            // Check file validity
-            if (!FileUtils.isPdfFile(context, uri)) {
-                _state.update { it.copy(isLoading = false, errorMessage = context.getString(R.string.error_invalid_pdf)) }
-                return@launch
-            }
-
-            if (FileUtils.isFileTooLarge(context, uri)) {
-                _state.update { it.copy(isLoading = false, errorMessage = context.getString(R.string.error_large_pdf)) }
-                return@launch
-            }
+            // Skip isPdfFile/isFileTooLarge pre-checks — they open a stream which can
+            // spuriously fail right after the picker returns, producing the false
+            // "Akses file kedaluwarsa" error.  PdfRendererManager does the real
+            // validation during openPdf() with retry logic.
 
             val result = pdfRendererManager.openPdf(uri)
             result.fold(
@@ -122,7 +118,7 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
                             if (error.message?.contains("password", ignoreCase = true) == true) {
                                 context.getString(R.string.error_password_pdf)
                             } else {
-                                context.getString(R.string.error_file_access_expired)
+                                context.getString(R.string.error_open_pdf)
                             }
                         }
                         is java.io.IOException -> {

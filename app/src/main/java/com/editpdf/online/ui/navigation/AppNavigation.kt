@@ -182,15 +182,18 @@ fun AppNavigation() {
 }
 
 private fun persistReadPermission(context: Context, uri: Uri) {
+    // Try to take persistable read permission. If the provider does not support
+    // persistable permissions (e.g. Google Drive, some OEM providers), this will
+    // throw but the URI still has temporary access that is valid for the current session.
     try {
         context.contentResolver.takePersistableUriPermission(
             uri,
             Intent.FLAG_GRANT_READ_URI_PERMISSION
         )
     } catch (_: SecurityException) {
-        // Some providers only grant temporary access.
+        // Provider only granted temporary access — still fine for this session.
     } catch (_: IllegalArgumentException) {
-        // Some providers do not support persistable permissions.
+        // Provider does not support persistable permissions.
     } catch (_: Exception) {
         // Keep editor flow working even if persist permission fails.
     }
