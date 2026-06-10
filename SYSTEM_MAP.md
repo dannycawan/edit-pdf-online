@@ -1,5 +1,5 @@
 # SYSTEM_MAP.md — Edit PDF Online - Text Editor
-> Terakhir diperbarui: 2026-06-07
+> Terakhir diperbarui: 2026-06-10
 
 ---
 
@@ -31,8 +31,11 @@ User tap "Open PDF" (HomeScreen)
   -> SAF file picker (implemented via ActivityResultContracts)
     -> AppNavigation.editorRoute(uri)
       -> EditorScreen (diimplementasi dengan EditorViewModel)
-        -> PdfRendererManager.openPdf(uri)         // buka & render halaman
-        -> PdfRendererManager.renderPage(pageIndex) // render ke Bitmap
+        -> PdfRendererManager.openPdf(uri)         // 3 strategies:
+           1. Copy SAF file ke temp + PdfRenderer   // primary
+           2. Direct SAF FD + PdfRenderer            // fallback 1
+           3. PdfBox validation (page count only)    // fallback 2 jika PdfRenderer SecurityException
+        -> PdfRendererManager.renderPage(pageIndex)  // render ke Bitmap (null jika PdfBox fallback aktif)
         -> User menambah overlay (Text/Cover/Signature/Checkmark)
           -> EditorState.editObjects di-update
         -> PdfExportManager.exportPdf(sourceUri, editObjects, outputStream)
@@ -201,7 +204,7 @@ edit pdf online/
 
 | File | Fungsi/Class Utama | Peran |
 |------|-------------------|-------|
-| `PdfRendererManager.kt` | `openPdf()`, `renderPage()`, `closePdf()`, `getPageDimensions()` | Render PDF ke Bitmap via Android PdfRenderer; copy SAF file ke temp |
+| `PdfRendererManager.kt` | `openPdf()`, `renderPage()`, `closePdf()`, `getPageDimensions()`, `openWithPdfBox()` | Render PDF ke Bitmap via Android PdfRenderer; fallback ke PdfBox untuk validasi + page count jika PdfRenderer gagal (SecurityException). Copy SAF file ke temp dengan retry & delay progresif. |
 | `PdfExportManager.kt` | `exportPdf()`, `exportToFile()`, `drawTextObject()`, `drawCoverObject()`, `drawSignatureObject()`, `drawCheckmarkObject()` | Menulis semua overlay edit ke PDF baru via PdfBox-Android |
 | `PdfEditorEngine.kt` | `screenToPdf()`, `pdfToScreen()`, `screenSizeToPdf()` | Konversi koordinat antara screen space (Compose) dan PDF space (PdfBox) |
 | `PdfMergeManager.kt` | `PdfMergeManager.mergePdfs()`, `PdfPageToolManager.splitPdf()`, `.rotatePages()`, `.deletePages()` | Tools merge, split, rotate, delete halaman PDF |
@@ -309,10 +312,10 @@ edit pdf online/
 
 ## Build & Release Status
 
-- **Remote utama**: `origin/main` sudah mengikuti commit lokal `664d6c6` setelah force push.
+- **Remote utama**: `origin/main` pada commit `722d2ea` (2026-06-10).
 - **GitHub Actions**: `Android Build` run `27085606975` pada branch `main` selesai `success`.
 - **Artifacts terbaru**: APK `edit-pdf-online-debug-apk` id `7461740645`; AAB `edit-pdf-online-release-aab` id `7461740973`.
-- **Fresh picker patch**: Local `clean assembleDebug` dan GitHub Actions APK/AAB build sukses.
+- **Fresh picker & SecurityException fix**: Local `assembleDebug` sukses (2 build berturut-turut). PdfBox fallback untuk PdfRenderer SecurityException sudah aktif.
 
 ---
 
@@ -325,3 +328,4 @@ edit pdf online/
 5. **ProGuard rules** hanya komentar default — belum ada rules untuk PdfBox-Android atau AdMob.
 6. **Runtime QA PDF Tools** masih perlu dicoba di perangkat dengan PDF nyata untuk export quality, large PDF, dan file password-protected.
 7. **Launcher icon** saat ini memakai vector sederhana `@drawable/ic_launcher`; aset produksi final belum dibuat.
+8. **PdfBox rendering unavailable** — PdfBox-Android 2.0.27.0 tidak menyediakan API konversi `BufferedImage` ke `Bitmap` Android. Saat PdfBox fallback aktif, preview halaman tidak tampil, tetapi navigasi, page count, dan export tetap berfungsi.

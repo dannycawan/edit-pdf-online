@@ -1,5 +1,5 @@
 # MASTER_PLAN.md — Edit PDF Online - Text Editor
-> Terakhir diperbarui: 2026-06-07
+> Terakhir diperbarui: 2026-06-10
 
 Dokumen ini adalah acuan utama (master plan) pengembangan aplikasi berdasarkan **IMPLEMENTATION ORDER** dari spesifikasi produk. Centang checklist saat setiap sub-task selesai.
 
@@ -133,7 +133,7 @@ Dokumen ini adalah acuan utama (master plan) pengembangan aplikasi berdasarkan *
 - [x] PDF to Image.
 - [x] Interstitial only after successful tool completion and frequency cap.
 
-## Milestone 15: Final Polish 🔄 (In Progress)
+## Milestone 15: Final Polish ✅
 - [x] Build debug APK and release AAB on GitHub Actions after fresh picker fix on `main` (latest run `27085606975` passed).
 - [x] Merge latest `origin/main` PdfRenderer stabilization and keep SAF access error handling.
 - [x] Force push local `main` to `origin/main` at commit `664d6c6`.
@@ -155,3 +155,7 @@ Dokumen ini adalah acuan utama (master plan) pengembangan aplikasi berdasarkan *
 - [x] Test Crashlytics setup (stub present; real setup blocked until Firebase config).
 - [x] Update `SYSTEM_MAP.md`.
 - [x] Update `DEV_PROGRESS.md`.
+- [x] **Fix false "Akses file kedaluwarsa"**: Remove canAccessUri() pre-check in PdfRendererManager.
+- [x] **Fix false "PDF dilindungi kata sandi"**: Add PdfBox fallback validation when PdfRenderer throws SecurityException; editor opens with page count & export working even without preview.
+- [x] **Improve SAF copy retry**: Add 100ms initial delay + progressive retry delays for SecurityException.
+- [x] **Remove premature isValidPdf/isFileTooLarge checks**: These stream-based checks could fail before reaching the renderer.
