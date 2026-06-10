@@ -112,14 +112,9 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
                     analyticsTracker.trackPdfOpenFailed(error.message ?: "unknown")
                     CrashReporter.logError(error, "EditorViewModel.loadPdf")
 
-                    // Provide user-friendly error message based on exception type
                     val userMessage = when (error) {
                         is SecurityException -> {
-                            if (error.message?.contains("password", ignoreCase = true) == true) {
-                                context.getString(R.string.error_password_pdf)
-                            } else {
-                                context.getString(R.string.error_open_pdf)
-                            }
+                            context.getString(R.string.error_password_pdf)
                         }
                         is java.io.IOException -> {
                             context.getString(R.string.error_open_pdf)
