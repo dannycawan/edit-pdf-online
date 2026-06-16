@@ -1,13 +1,22 @@
 # DEV_PROGRESS.md — Edit PDF Online - Text Editor
-> Terakhir diperbarui: 2026-06-16
+> Terakhir diperbarui: 2026-06-16 (siklus 2)
 
 ---
 
 ## Active Task
 
-Memperbaiki error "Tidak dapat membuka file PDF" pada tombol Buka PDF, kelompok Alat Utama, dan edit tools yang membuka Editor.
+Perbaikan Alat Utama (Main Tools) tidak mengaktifkan tool yang sesuai saat editor dibuka, dan peningkatan kualitas PDF preview.
 
 ## Current Status
+
+- **Fix Alat Utama**: Root cause ditemukan — semua 4 card di `MainToolsGrid` memanggil `onOpenPdf` yang SAMA, dan route editor tidak membawa informasi tool yang dipilih.
+  1. Route editor sekarang memiliki parameter opsional `tool`: `editor?uri={uri}&tool={tool}`.
+  2. `HomeScreen.MainToolsGrid` sekarang mengirim tool ID yang berbeda untuk setiap card (COVER, SIGN, CHECKMARK, TEXT).
+  3. `ToolsScreen` yang ada di `AppNavigation` juga meneruskan tool ID yang sesuai ke route editor (edit_text→COVER, sign→SIGN, fill_form→CHECKMARK, add_text→TEXT).
+  4. `EditorScreen` menerima parameter `initialTool: String` dan auto-select tool via `LaunchedEffect(initialTool, state.totalPages)` setelah PDF berhasil dimuat.
+- **Fix PDF Preview**: Background canvas PDF diganti dari abu-abu (`SurfaceVariant`) ke hitam gelap (`0xFF212121`), seperti PDF viewer profesional. Render scale dinaikkan dari 2.0f ke 2.5f.
+- **Fix Navigation Bar Editor**: `PageNavigationBar` diubah ke dark background hitam dengan tombol biru untuk konsistensi dengan dark canvas area.
+- **Fix Toolbar Bottom**: Selected tool state lebih jelas dengan background biru translucent dan teks semi-bold.
 
 - **SecurityException Fix**: Root cause ditemukan dan diperbaiki:
   1. `canAccessUri()` di `PdfRendererManager` melakukan `openInputStream()` sebagai pre-check — pada beberapa device/provider SAF, URI baru dari picker belum siap dibaca dalam milidetik pertama, menyebabkan false "Akses file kedaluwarsa".
@@ -58,6 +67,9 @@ Memperbaiki error "Tidak dapat membuka file PDF" pada tombol Buka PDF, kelompok 
 - [x] **Fix false "PDF dilindungi kata sandi"**: PdfBox fallback untuk PDF yang ditolak PdfRenderer; error message lebih akurat.
 - [x] **Fix false "Tidak dapat membuka file PDF" pada Alat Utama**: Hapus double `Uri.decode()` di `AppNavigation` agar SAF URI tidak rusak saat melewati route Editor.
 - [x] **Perkuat copy SAF Editor**: Tambah fallback copy temp via `openFileDescriptor()` ketika `openInputStream()` gagal.
+- [x] **Fix Alat Utama tidak mengaktifkan tool**: Route editor kini memiliki param `tool`; setiap tool card mengirim toolId berbeda; EditorScreen auto-select tool via `LaunchedEffect`.
+- [x] **Improve PDF Preview**: Background canvas hitam gelap seperti viewer profesional; render scale dinaikkan ke 2.5f.
+- [x] **Improve Editor UI**: PageNavigationBar dark theme; ToolButton selected state lebih jelas.
 
 ## In Progress
 
@@ -74,13 +86,14 @@ Memperbaiki error "Tidak dapat membuka file PDF" pada tombol Buka PDF, kelompok 
 2. Test apakah PDF dengan DRM/restrictions bisa dibuka (tanpa preview, dengan page count).
 3. Test export tetap berfungsi untuk PDF yang dibuka via PdfBox fallback.
 
-## Files Modified (siklus ini)
+## Files Modified (siklus 2 — 2026-06-16)
 
 | File | Perubahan |
 |------|-----------|
-| `PdfRendererManager.kt` | Hapus `canAccessUri()` pre-check; tambah retry delay; tambah PdfBox fallback (openWithPdfBox); getPageDimensions via PdfBox |
-| `EditorViewModel.kt` | Hapus `isPdfFile()`/`isFileTooLarge()` pre-check; error mapping lebih akurat (SecurityException -> password_pdf, IOException -> open_pdf) |
-| `AppNavigation.kt` | Perbaiki komentar `persistReadPermission` |
+| `AppNavigation.kt` | Tambah param `tool` ke route editor; `pendingToolId` pakai `mutableStateOf`; tool mapping (edit_text→COVER, sign→SIGN, fill_form→CHECKMARK, add_text→TEXT) |
+| `HomeScreen.kt` | `onOpenPdfWithTool` callback baru; setiap tool card kirim toolId berbeda |
+| `EditorScreen.kt` | Terima `initialTool: String`; auto-select via LaunchedEffect; dark canvas background; PageNavigationBar dark theme; ToolButton selected state lebih jelas |
+| `PdfRendererManager.kt` | Naikkan render scale default dari 2.0f ke 2.5f |
 
 ## Errors / Blockers
 

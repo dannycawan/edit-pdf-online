@@ -29,13 +29,14 @@
 ```
 User tap "Open PDF" (HomeScreen)
   -> SAF file picker (implemented via ActivityResultContracts)
-    -> AppNavigation.editorRoute(uri) // Uri.encode() once; do not Uri.decode() again
+    -> AppNavigation.editorRoute(uri, toolId?) // Uri.encode() once; do not Uri.decode() again
       -> EditorScreen (diimplementasi dengan EditorViewModel)
         -> PdfRendererManager.openPdf(uri)         // 3 strategies:
            1. Copy SAF file ke temp + PdfRenderer   // primary
            2. Direct SAF FD + PdfRenderer            // fallback 1
            3. PdfBox validation (page count only)    // fallback 2 jika PdfRenderer SecurityException
-        -> PdfRendererManager.renderPage(pageIndex)  // render ke Bitmap (null jika PdfBox fallback aktif)
+        -> PdfRendererManager.renderPage(pageIndex)  // render ke Bitmap @ scale 2.5f (null jika PdfBox fallback aktif)
+        -> EditorScreen.LaunchedEffect(initialTool, totalPages) // auto-select tool setelah PDF load
         -> User menambah overlay (Text/Cover/Signature/Checkmark)
           -> EditorState.editObjects di-update
         -> PdfExportManager.exportPdf(sourceUri, editObjects, outputStream)
@@ -313,9 +314,9 @@ edit pdf online/
 
 ## Build & Release Status
 
-- **Remote utama**: `origin/main` pada commit `25a5c9b` (2026-06-16).
-- **GitHub Actions**: `Android Build` run `27605133029` pada branch `main` selesai `success`.
-- **Artifacts terbaru**: APK `edit-pdf-online-debug-apk` id `7661622254`; AAB `edit-pdf-online-release-aab` id `7661623331`.
+- **Remote utama**: `origin/main` pada commit `4ad9e75` (2026-06-16 siklus 2).
+- **GitHub Actions**: Build sedang berjalan untuk commit `4ad9e75` (fix Alat Utama + improve PDF preview).
+- **Perubahan siklus 2**: Route editor memiliki param `tool`; MainTools auto-select; PDF preview lebih tajam dan UI editor lebih premium.
 - **Fresh picker, SecurityException, dan Editor route URI fix**: Local `assembleDebug` tidak dijalankan untuk patch 2026-06-16 sesuai instruksi user; verifikasi dilakukan lewat GitHub Actions.
 
 ---
