@@ -1,5 +1,5 @@
 # MASTER_PLAN.md — Edit PDF Online - Text Editor
-> Terakhir diperbarui: 2026-06-10
+> Terakhir diperbarui: 2026-06-16
 
 Dokumen ini adalah acuan utama (master plan) pengembangan aplikasi berdasarkan **IMPLEMENTATION ORDER** dari spesifikasi produk. Centang checklist saat setiap sub-task selesai.
 
@@ -159,3 +159,6 @@ Dokumen ini adalah acuan utama (master plan) pengembangan aplikasi berdasarkan *
 - [x] **Fix false "PDF dilindungi kata sandi"**: Add PdfBox fallback validation when PdfRenderer throws SecurityException; editor opens with page count & export working even without preview.
 - [x] **Improve SAF copy retry**: Add 100ms initial delay + progressive retry delays for SecurityException.
 - [x] **Remove premature isValidPdf/isFileTooLarge checks**: These stream-based checks could fail before reaching the renderer.
+- [x] **Fix Editor route SAF URI corruption**: Remove extra `Uri.decode()` in `AppNavigation`; Navigation Compose already decodes route arguments once.
+- [x] **Add SAF descriptor copy fallback**: `PdfRendererManager` now falls back from `openInputStream()` to `openFileDescriptor()` when copying a picked PDF to temp.
+- [ ] Run GitHub Actions build for latest Editor route fix (local build intentionally skipped per user request).

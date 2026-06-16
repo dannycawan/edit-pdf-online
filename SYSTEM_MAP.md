@@ -1,5 +1,5 @@
 # SYSTEM_MAP.md — Edit PDF Online - Text Editor
-> Terakhir diperbarui: 2026-06-10
+> Terakhir diperbarui: 2026-06-16
 
 ---
 
@@ -29,7 +29,7 @@
 ```
 User tap "Open PDF" (HomeScreen)
   -> SAF file picker (implemented via ActivityResultContracts)
-    -> AppNavigation.editorRoute(uri)
+    -> AppNavigation.editorRoute(uri) // Uri.encode() once; do not Uri.decode() again
       -> EditorScreen (diimplementasi dengan EditorViewModel)
         -> PdfRendererManager.openPdf(uri)         // 3 strategies:
            1. Copy SAF file ke temp + PdfRenderer   // primary
@@ -254,9 +254,10 @@ edit pdf online/
 ### Editor File Picker Policy
 
 - Home hero dan semua Main Tools memakai satu launcher `OpenDocument` dengan MIME `application/pdf`.
+- URI hasil picker boleh melewati Navigation route hanya dalam bentuk encoded route argument. Navigation Compose sudah mengembalikan argumen yang decoded satu kali; jangan panggil `Uri.decode()` lagi sebelum `EditorScreen`.
 - Recent item di Home dan `RecentFilesScreen` membuka picker ulang; URI yang tersimpan hanya menjadi metadata recent dan tidak dipakai langsung untuk membuka Editor.
 - `persistReadPermission()` mengabaikan provider yang hanya memberi akses sementara atau tidak mendukung permission persisten.
-- PDF Tools tetap memakai flow miliknya sendiri dan tidak diubah oleh patch ini.
+- PDF Tools tetap memakai flow miliknya sendiri dan memakai URI langsung di `ToolsScreen`/`ToolsViewModel`, sehingga tidak terdampak bug encoding route Editor.
 
 ---
 
@@ -315,7 +316,7 @@ edit pdf online/
 - **Remote utama**: `origin/main` pada commit `722d2ea` (2026-06-10).
 - **GitHub Actions**: `Android Build` run `27085606975` pada branch `main` selesai `success`.
 - **Artifacts terbaru**: APK `edit-pdf-online-debug-apk` id `7461740645`; AAB `edit-pdf-online-release-aab` id `7461740973`.
-- **Fresh picker & SecurityException fix**: Local `assembleDebug` sukses (2 build berturut-turut). PdfBox fallback untuk PdfRenderer SecurityException sudah aktif.
+- **Fresh picker & SecurityException fix**: Local `assembleDebug` lama sukses (2 build berturut-turut). Patch 2026-06-16 untuk route Editor belum dibuild lokal sesuai instruksi user; verifikasi dilakukan lewat GitHub Actions.
 
 ---
 

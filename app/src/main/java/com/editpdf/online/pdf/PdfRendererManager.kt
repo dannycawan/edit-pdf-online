@@ -17,6 +17,7 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.io.InputStream
 
 class PdfRendererManager(private val context: Context) {
 
@@ -278,22 +279,13 @@ class PdfRendererManager(private val context: Context) {
                 if (attempt == 1) delay(100L)
 
                 val tempFile = File(context.cacheDir, "temp_pdf_${System.currentTimeMillis()}_$attempt.pdf")
-                val inputStream = context.contentResolver.openInputStream(uri)
-                if (inputStream == null) {
-                    delay(300L * attempt)
-                } else {
-                    inputStream.use { input ->
-                        FileOutputStream(tempFile).use { output ->
-                            input.copyTo(output)
-                        }
-                    }
-                    if (tempFile.exists() && tempFile.length() > 0) {
-                        return tempFile
-                    }
-                    tempFile.delete()
-                    CrashReporter.logMessage("PDF temp copy empty on attempt $attempt")
-                    delay(300L * attempt)
+                val copied = copyUriToFile(uri, tempFile)
+                if (copied && tempFile.exists() && tempFile.length() > 0) {
+                    return tempFile
                 }
+                tempFile.delete()
+                CrashReporter.logMessage("PDF temp copy empty on attempt $attempt")
+                delay(300L * attempt)
             } catch (e: SecurityException) {
                 CrashReporter.logError(e, "PdfRendererManager.copyToTempFile SecurityException on attempt $attempt")
                 if (attempt < maxAttempts) {
@@ -309,6 +301,31 @@ class PdfRendererManager(private val context: Context) {
             }
         }
         return null
+    }
+
+    private fun copyUriToFile(uri: Uri, destination: File): Boolean {
+        val stream = openInputStreamForCopy(uri) ?: return false
+        stream.use { input ->
+            FileOutputStream(destination).use { output ->
+                input.copyTo(output)
+            }
+        }
+        return true
+    }
+
+    private fun openInputStreamForCopy(uri: Uri): InputStream? {
+        return try {
+            context.contentResolver.openInputStream(uri)
+        } catch (e: Exception) {
+            CrashReporter.logError(e, "PdfRendererManager.openInputStreamForCopy openInputStream")
+            null
+        } ?: try {
+            val fd = context.contentResolver.openFileDescriptor(uri, "r") ?: return null
+            ParcelFileDescriptor.AutoCloseInputStream(fd)
+        } catch (e: Exception) {
+            CrashReporter.logError(e, "PdfRendererManager.openInputStreamForCopy openFileDescriptor")
+            null
+        }
     }
 
     suspend fun cleanupTempFiles() = withContext(Dispatchers.IO) {

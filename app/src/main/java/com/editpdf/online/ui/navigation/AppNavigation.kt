@@ -104,7 +104,9 @@ fun AppNavigation() {
                 .getStateFlow("signature_path", "")
                 .collectAsState()
             EditorScreen(
-                uriString = Uri.decode(uri),
+                // Navigation already decodes query arguments once. Decoding again can corrupt
+                // SAF document IDs that intentionally contain escaped slashes, e.g. %2F.
+                uriString = uri,
                 onNavigateBack = { navController.popBackStack() },
                 onNavigateToSignature = { navController.navigate(Routes.SIGNATURE) },
                 signatureImagePath = signaturePath,

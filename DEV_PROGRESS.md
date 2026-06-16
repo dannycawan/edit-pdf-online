@@ -1,11 +1,11 @@
 # DEV_PROGRESS.md — Edit PDF Online - Text Editor
-> Terakhir diperbarui: 2026-06-10
+> Terakhir diperbarui: 2026-06-16
 
 ---
 
 ## Active Task
 
-Memperbaiki error "Akses file kedaluwarsa" dan "PDF dilindungi kata sandi" palsu saat membuka PDF dari SAF picker.
+Memperbaiki error "Tidak dapat membuka file PDF" pada tombol Buka PDF, kelompok Alat Utama, dan edit tools yang membuka Editor.
 
 ## Current Status
 
@@ -16,7 +16,10 @@ Memperbaiki error "Akses file kedaluwarsa" dan "PDF dilindungi kata sandi" palsu
 - **PdfBox Fallback**: Ketika PdfRenderer gagal dengan SecurityException, PdfBox-Android digunakan sebagai fallback untuk validasi dan mendapatkan page count. Editor tetap bisa dibuka dengan navigasi halaman, dan export (via PdfBox) tetap berfungsi.
 - **Peningkatan Retry**: `copyToTempFileWithRetry()` sekarang menunggu 100ms sebelum attempt pertama dan melakukan retry dengan delay progresif saat `SecurityException`.
 - **Error Message Mapping**: `EditorViewModel` sekarang hanya menampilkan "password-protected" untuk SecurityException yang benar-benar tidak bisa diatasi (PdfBox juga gagal). IOException ditampilkan sebagai "Tidak dapat membuka PDF".
-- **Build**: Local `assembleDebug` sukses (2 perbaikan berturut-turut).
+- **Root cause baru (2026-06-16)**: Flow Alat Utama berbeda dari Alat PDF. Alat PDF memakai URI langsung di `ToolsScreen`/`ToolsViewModel`, sedangkan Alat Utama memasukkan URI ke route `editor?uri=...`. Navigation Compose sudah decode argumen route sekali, tetapi `AppNavigation` melakukan `Uri.decode()` lagi. Ini merusak SAF document ID seperti `primary%3ADownload%2Ffile.pdf` menjadi `primary:Download/file.pdf`, sehingga `ContentResolver` gagal membuka file valid.
+- **Fix route Editor**: `AppNavigation` tidak lagi melakukan double-decode URI sebelum mengirim ke `EditorScreen`.
+- **Fix pembacaan SAF tambahan**: `PdfRendererManager.copyToTempFileWithRetry()` sekarang mencoba copy lewat `openInputStream()` dan fallback `openFileDescriptor()`/`AutoCloseInputStream`.
+- **Build**: Local `assembleDebug` lama pernah sukses, tetapi untuk siklus 2026-06-16 build lokal tidak dijalankan. Verifikasi berikutnya harus lewat GitHub Actions.
 - **Riwayat Perbaikan**: Lihat bagian Errors / Blockers di bawah.
 
 ## What Has Been Confirmed
@@ -53,6 +56,8 @@ Memperbaiki error "Akses file kedaluwarsa" dan "PDF dilindungi kata sandi" palsu
 - [x] Fix expired recent URI hanya di `AppNavigation.kt`.
 - [x] **Fix false "Akses file kedaluwarsa"**: Hapus `canAccessUri()` pre-check; langsung copy + retry.
 - [x] **Fix false "PDF dilindungi kata sandi"**: PdfBox fallback untuk PDF yang ditolak PdfRenderer; error message lebih akurat.
+- [x] **Fix false "Tidak dapat membuka file PDF" pada Alat Utama**: Hapus double `Uri.decode()` di `AppNavigation` agar SAF URI tidak rusak saat melewati route Editor.
+- [x] **Perkuat copy SAF Editor**: Tambah fallback copy temp via `openFileDescriptor()` ketika `openInputStream()` gagal.
 
 ## In Progress
 
