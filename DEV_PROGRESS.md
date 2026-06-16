@@ -19,7 +19,7 @@ Memperbaiki error "Tidak dapat membuka file PDF" pada tombol Buka PDF, kelompok 
 - **Root cause baru (2026-06-16)**: Flow Alat Utama berbeda dari Alat PDF. Alat PDF memakai URI langsung di `ToolsScreen`/`ToolsViewModel`, sedangkan Alat Utama memasukkan URI ke route `editor?uri=...`. Navigation Compose sudah decode argumen route sekali, tetapi `AppNavigation` melakukan `Uri.decode()` lagi. Ini merusak SAF document ID seperti `primary%3ADownload%2Ffile.pdf` menjadi `primary:Download/file.pdf`, sehingga `ContentResolver` gagal membuka file valid.
 - **Fix route Editor**: `AppNavigation` tidak lagi melakukan double-decode URI sebelum mengirim ke `EditorScreen`.
 - **Fix pembacaan SAF tambahan**: `PdfRendererManager.copyToTempFileWithRetry()` sekarang mencoba copy lewat `openInputStream()` dan fallback `openFileDescriptor()`/`AutoCloseInputStream`.
-- **Build**: Local `assembleDebug` lama pernah sukses, tetapi untuk siklus 2026-06-16 build lokal tidak dijalankan. Verifikasi berikutnya harus lewat GitHub Actions.
+- **Build**: Local `assembleDebug` tidak dijalankan untuk siklus 2026-06-16. Verifikasi dilakukan lewat GitHub Actions; run `27605133029` passed.
 - **Riwayat Perbaikan**: Lihat bagian Errors / Blockers di bawah.
 
 ## What Has Been Confirmed
@@ -68,6 +68,7 @@ Memperbaiki error "Tidak dapat membuka file PDF" pada tombol Buka PDF, kelompok 
 1. **Device QA**: Install APK terbaru dan test open PDF dari:
    - Home hero button
    - Main Tools grid
+   - Tools tab -> Edit Text / Sign / Fill Form / Add Text
    - Recent files
    - File dari Google Drive / Download / internal storage
 2. Test apakah PDF dengan DRM/restrictions bisa dibuka (tanpa preview, dengan page count).

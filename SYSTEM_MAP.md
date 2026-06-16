@@ -313,10 +313,10 @@ edit pdf online/
 
 ## Build & Release Status
 
-- **Remote utama**: `origin/main` pada commit `722d2ea` (2026-06-10).
-- **GitHub Actions**: `Android Build` run `27085606975` pada branch `main` selesai `success`.
-- **Artifacts terbaru**: APK `edit-pdf-online-debug-apk` id `7461740645`; AAB `edit-pdf-online-release-aab` id `7461740973`.
-- **Fresh picker & SecurityException fix**: Local `assembleDebug` lama sukses (2 build berturut-turut). Patch 2026-06-16 untuk route Editor belum dibuild lokal sesuai instruksi user; verifikasi dilakukan lewat GitHub Actions.
+- **Remote utama**: `origin/main` pada commit `25a5c9b` (2026-06-16).
+- **GitHub Actions**: `Android Build` run `27605133029` pada branch `main` selesai `success`.
+- **Artifacts terbaru**: APK `edit-pdf-online-debug-apk` id `7661622254`; AAB `edit-pdf-online-release-aab` id `7661623331`.
+- **Fresh picker, SecurityException, dan Editor route URI fix**: Local `assembleDebug` tidak dijalankan untuk patch 2026-06-16 sesuai instruksi user; verifikasi dilakukan lewat GitHub Actions.
 
 ---
 

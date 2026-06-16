@@ -161,4 +161,4 @@ Dokumen ini adalah acuan utama (master plan) pengembangan aplikasi berdasarkan *
 - [x] **Remove premature isValidPdf/isFileTooLarge checks**: These stream-based checks could fail before reaching the renderer.
 - [x] **Fix Editor route SAF URI corruption**: Remove extra `Uri.decode()` in `AppNavigation`; Navigation Compose already decodes route arguments once.
 - [x] **Add SAF descriptor copy fallback**: `PdfRendererManager` now falls back from `openInputStream()` to `openFileDescriptor()` when copying a picked PDF to temp.
-- [ ] Run GitHub Actions build for latest Editor route fix (local build intentionally skipped per user request).
+- [x] Run GitHub Actions build for latest Editor route fix (local build intentionally skipped per user request; GitHub Actions run `27605133029` passed).
