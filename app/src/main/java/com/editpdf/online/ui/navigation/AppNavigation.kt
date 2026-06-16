@@ -15,7 +15,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
@@ -37,14 +39,20 @@ import com.editpdf.online.ui.tools.ToolsScreen
  */
 object Routes {
     const val HOME = "home"
-    const val EDITOR = "editor?uri={uri}"
+    // tool param is optional — empty string means "no specific tool pre-selected"
+    const val EDITOR = "editor?uri={uri}&tool={tool}"
     const val SIGNATURE = "signature"
     const val RECENT_FILES = "recent_files"
     const val TOOLS = "tools"
     const val SETTINGS = "settings"
     const val ONBOARDING = "onboarding"
 
-    fun editorRoute(uri: String): String = "editor?uri=${Uri.encode(uri)}"
+    /**
+     * Builds the editor route with an encoded URI and an optional tool ID.
+     * toolId values match EditorTool enum names: "TEXT", "COVER", "REPLACE", "SIGN", "CHECKMARK"
+     */
+    fun editorRoute(uri: String, toolId: String = ""): String =
+        "editor?uri=${Uri.encode(uri)}&tool=${Uri.encode(toolId)}"
 }
 
 @Composable
@@ -60,21 +68,31 @@ fun AppNavigation() {
         startDestination = Routes.HOME
     ) {
         composable(Routes.HOME) {
-            // SAF file picker launcher
+            // pendingToolId persists across recompositions so the launcher callback
+            // always reads the most recent value.
+            var pendingToolId by remember { mutableStateOf("") }
+
             val filePickerLauncher = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.OpenDocument()
             ) { uri: Uri? ->
                 uri?.let {
                     persistReadPermission(context, it)
-                    navController.navigate(Routes.editorRoute(it.toString()))
+                    navController.navigate(Routes.editorRoute(it.toString(), pendingToolId))
+                    pendingToolId = ""
                 }
             }
 
             HomeScreen(
                 onOpenPdf = {
+                    pendingToolId = ""
+                    filePickerLauncher.launch(arrayOf("application/pdf"))
+                },
+                onOpenPdfWithTool = { toolId ->
+                    pendingToolId = toolId
                     filePickerLauncher.launch(arrayOf("application/pdf"))
                 },
                 onNavigateToEditor = {
+                    pendingToolId = ""
                     filePickerLauncher.launch(arrayOf("application/pdf"))
                 },
                 onNavigateToTools = {
@@ -96,10 +114,15 @@ fun AppNavigation() {
                 navArgument("uri") {
                     type = NavType.StringType
                     defaultValue = ""
+                },
+                navArgument("tool") {
+                    type = NavType.StringType
+                    defaultValue = ""
                 }
             )
         ) { backStackEntry ->
             val uri = backStackEntry.arguments?.getString("uri") ?: ""
+            val tool = backStackEntry.arguments?.getString("tool") ?: ""
             val signaturePath by backStackEntry.savedStateHandle
                 .getStateFlow("signature_path", "")
                 .collectAsState()
@@ -107,6 +130,7 @@ fun AppNavigation() {
                 // Navigation already decodes query arguments once. Decoding again can corrupt
                 // SAF document IDs that intentionally contain escaped slashes, e.g. %2F.
                 uriString = uri,
+                initialTool = tool,
                 onNavigateBack = { navController.popBackStack() },
                 onNavigateToSignature = { navController.navigate(Routes.SIGNATURE) },
                 signatureImagePath = signaturePath,
@@ -148,13 +172,17 @@ fun AppNavigation() {
         }
 
         composable(Routes.TOOLS) {
-            // SAF file picker for tools that need a PDF file
+            // pendingToolId persists across recompositions so the launcher callback
+            // always reads the most recent value.
+            var pendingToolId by remember { mutableStateOf("") }
+
             val toolFilePickerLauncher = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.OpenDocument()
             ) { uri: Uri? ->
                 uri?.let {
                     persistReadPermission(context, it)
-                    navController.navigate(Routes.editorRoute(it.toString()))
+                    navController.navigate(Routes.editorRoute(it.toString(), pendingToolId))
+                    pendingToolId = ""
                 }
             }
 
@@ -163,7 +191,14 @@ fun AppNavigation() {
                 onToolClick = { toolId ->
                     when (toolId) {
                         "edit_text", "add_text", "sign", "fill_form" -> {
-                            // These tools open the editor with a file picker
+                            // Map UI tool IDs to EditorTool enum names
+                            pendingToolId = when (toolId) {
+                                "edit_text" -> "COVER"    // Edit text = cover + replace workflow
+                                "sign"      -> "SIGN"
+                                "fill_form" -> "CHECKMARK"
+                                "add_text"  -> "TEXT"
+                                else        -> ""
+                            }
                             toolFilePickerLauncher.launch(arrayOf("application/pdf"))
                         }
                     }

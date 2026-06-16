@@ -178,7 +178,7 @@ class PdfRendererManager(private val context: Context) {
         }
     }
 
-    suspend fun renderPage(pageIndex: Int, scale: Float = 2.0f): Bitmap? =
+    suspend fun renderPage(pageIndex: Int, scale: Float = 2.5f): Bitmap? =
         withContext(Dispatchers.IO) {
             mutex.withLock {
                 try {

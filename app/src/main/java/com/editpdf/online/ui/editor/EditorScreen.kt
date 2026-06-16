@@ -54,6 +54,7 @@ import com.editpdf.online.utils.ShareUtils
 @Composable
 fun EditorScreen(
     uriString: String,
+    initialTool: String = "",
     onNavigateBack: () -> Unit,
     onNavigateToSignature: () -> Unit,
     signatureImagePath: String = "",
@@ -68,6 +69,17 @@ fun EditorScreen(
     LaunchedEffect(uriString) {
         if (uriString.isNotBlank()) {
             viewModel.loadPdf(uriString)
+        }
+    }
+
+    // Auto-select the initial tool after PDF is loaded (when totalPages > 0)
+    LaunchedEffect(initialTool, state.totalPages) {
+        if (initialTool.isNotBlank() && state.totalPages > 0) {
+            val tool = com.editpdf.online.domain.model.EditorTool.entries
+                .firstOrNull { it.name == initialTool }
+            if (tool != null && tool != com.editpdf.online.domain.model.EditorTool.NONE) {
+                viewModel.selectTool(tool)
+            }
         }
     }
 
@@ -170,12 +182,13 @@ fun EditorScreen(
                         InstructionBar(text = instruction)
                     }
 
-                    // PDF Canvas with overlays
+                    // PDF Canvas with overlays — dark viewer background
                     Box(
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxWidth()
-                            .padding(8.dp)
+                            .background(Color(0xFF212121))
+                            .padding(horizontal = 16.dp, vertical = 12.dp)
                     ) {
                         // PDF page image
                         pageBitmap?.let { bitmap ->
@@ -314,7 +327,7 @@ private fun PdfCanvasWithOverlays(
         modifier = Modifier
             .fillMaxSize()
             .clip(RoundedCornerShape(8.dp))
-            .shadow(4.dp, RoundedCornerShape(8.dp))
+            .shadow(8.dp, RoundedCornerShape(8.dp))
     ) {
         // PDF page bitmap
         Image(
@@ -491,13 +504,13 @@ private fun EditorBottomToolbar(
     hasSelectedObject: Boolean
 ) {
     Surface(
-        shadowElevation = 8.dp,
+        shadowElevation = 12.dp,
         color = Surface
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 4.dp),
+                .padding(horizontal = 4.dp, vertical = 6.dp),
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -556,9 +569,12 @@ private fun ToolButton(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
-            .clip(RoundedCornerShape(8.dp))
-            .background(if (isSelected) CardBlue else Color.Transparent)
-            .padding(horizontal = 8.dp, vertical = 4.dp)
+            .clip(RoundedCornerShape(10.dp))
+            .background(
+                if (isSelected) SecondaryBlue.copy(alpha = 0.12f)
+                else Color.Transparent
+            )
+            .padding(horizontal = 10.dp, vertical = 6.dp)
     ) {
         IconButton(
             onClick = onClick,
@@ -575,7 +591,8 @@ private fun ToolButton(
             text = label,
             style = MaterialTheme.typography.labelSmall,
             color = tint,
-            fontSize = 10.sp
+            fontSize = 10.sp,
+            fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal
         )
     }
 }
@@ -604,13 +621,13 @@ private fun PageNavigationBar(
     onNextPage: () -> Unit
 ) {
     Surface(
-        color = Surface,
-        shadowElevation = 2.dp
+        color = Color(0xFF1A1A1A),
+        shadowElevation = 0.dp
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
+                .padding(horizontal = 24.dp, vertical = 10.dp),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -618,16 +635,16 @@ private fun PageNavigationBar(
                 onClick = onPreviousPage,
                 enabled = currentPage > 0,
                 modifier = Modifier
-                    .size(36.dp)
+                    .size(40.dp)
                     .background(
-                        if (currentPage > 0) CardBlue else SurfaceVariant,
+                        if (currentPage > 0) SecondaryBlue else Color(0xFF444444),
                         CircleShape
                     )
             ) {
                 Icon(
                     Icons.Default.ChevronLeft,
                     contentDescription = stringResource(R.string.editor_previous_page),
-                    tint = if (currentPage > 0) PrimaryNavy else TextHint
+                    tint = OnPrimary
                 )
             }
 
@@ -637,7 +654,7 @@ private fun PageNavigationBar(
                 text = "${currentPage + 1} / $totalPages",
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.SemiBold,
-                color = OnBackground
+                color = OnPrimary
             )
 
             Spacer(modifier = Modifier.width(24.dp))
@@ -646,16 +663,16 @@ private fun PageNavigationBar(
                 onClick = onNextPage,
                 enabled = currentPage < totalPages - 1,
                 modifier = Modifier
-                    .size(36.dp)
+                    .size(40.dp)
                     .background(
-                        if (currentPage < totalPages - 1) CardBlue else SurfaceVariant,
+                        if (currentPage < totalPages - 1) SecondaryBlue else Color(0xFF444444),
                         CircleShape
                     )
             ) {
                 Icon(
                     Icons.Default.ChevronRight,
                     contentDescription = stringResource(R.string.editor_next_page),
-                    tint = if (currentPage < totalPages - 1) PrimaryNavy else TextHint
+                    tint = OnPrimary
                 )
             }
         }

@@ -46,6 +46,7 @@ import java.util.Locale
 @Composable
 fun HomeScreen(
     onOpenPdf: () -> Unit,
+    onOpenPdfWithTool: (String) -> Unit = {},
     onNavigateToEditor: (String) -> Unit,
     onNavigateToTools: () -> Unit,
     onNavigateToRecent: () -> Unit,
@@ -80,10 +81,10 @@ fun HomeScreen(
             SectionHeader(title = stringResource(R.string.main_tools))
             Spacer(modifier = Modifier.height(12.dp))
             MainToolsGrid(
-                onEditTextClick = onOpenPdf,
-                onSignClick = onOpenPdf,
-                onFillFormClick = onOpenPdf,
-                onAddTextClick = onOpenPdf
+                onEditTextClick = { onOpenPdfWithTool("COVER") },
+                onSignClick = { onOpenPdfWithTool("SIGN") },
+                onFillFormClick = { onOpenPdfWithTool("CHECKMARK") },
+                onAddTextClick = { onOpenPdfWithTool("TEXT") }
             )
 
             Spacer(modifier = Modifier.height(24.dp))
