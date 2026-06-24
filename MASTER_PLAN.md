@@ -1,5 +1,5 @@
 # MASTER_PLAN.md — Edit PDF Online - Text Editor
-> Terakhir diperbarui: 2026-06-16
+> Terakhir diperbarui: 2026-06-23
 
 Dokumen ini adalah acuan utama (master plan) pengembangan aplikasi berdasarkan **IMPLEMENTATION ORDER** dari spesifikasi produk. Centang checklist saat setiap sub-task selesai.
 
@@ -48,10 +48,10 @@ Dokumen ini adalah acuan utama (master plan) pengembangan aplikasi berdasarkan *
 ## Milestone 5: Add Text Tool ✅
 - [x] Add Text toolbar action.
 - [x] Tap to add text.
-- [x] Edit text.
+- [ ] Edit text object yang sudah ditempatkan (dialog saat ini hanya membuat object baru).
 - [x] Move text.
-- [x] Resize text (via scale/slider).
-- [x] Change font size.
+- [ ] Resize text object yang sudah ditempatkan (slider saat ini hanya berlaku saat membuat text baru).
+- [x] Change font size saat membuat text baru.
 - [x] Change color.
 - [x] Delete text.
 - [x] Track analytics (via stub).
@@ -62,12 +62,13 @@ Dokumen ini adalah acuan utama (master plan) pengembangan aplikasi berdasarkan *
 - [x] Move/resize/delete.
 - [x] Track analytics (via stub).
 
-## Milestone 7: Replace Text Tool ✅
+## Milestone 7: Replace Text Tool 🚧
 - [x] Select old text area.
 - [x] Add cover rectangle.
-- [x] Ask for new text.
-- [x] Place text above covered area.
-- [x] Move/resize/edit/delete.
+- [x] Ask for new text setelah area cover selesai dipilih.
+- [x] Place text above covered area secara otomatis.
+- [ ] Edit/resize replacement text setelah ditempatkan.
+- [x] Move/delete overlay object yang sudah ditempatkan.
 - [x] Track analytics (via stub).
 
 ## Milestone 8: Export PDF ✅
@@ -81,13 +82,14 @@ Dokumen ini adalah acuan utama (master plan) pengembangan aplikasi berdasarkan *
 - [x] Track export/share analytics (via stub).
 - [x] Do not overwrite original PDF.
 
-## Milestone 9: Signature ✅
+## Milestone 9: Signature 🚧
 - [x] Create signature screen.
 - [x] Draw signature.
 - [x] Save transparent PNG locally.
 - [x] Add `SignatureObject` (model & rendering ready).
 - [x] Place signature on PDF (UI ready).
-- [x] Move/resize/delete (UI ready).
+- [x] Move/delete signature object.
+- [x] Resize signature object dengan handle interaktif, minimum size, aspect-ratio lock, dan undo/redo.
 - [x] Export signature into PDF (`PdfExportManager` ready).
 - [x] Track analytics (via stub).
 
@@ -114,10 +116,13 @@ Dokumen ini adalah acuan utama (master plan) pengembangan aplikasi berdasarkan *
 - [x] Add Remote Config fallback values.
 - [ ] Uncomment Firebase dependencies & inject `google-services.json` (blocked: file tidak ada di repo).
 
-## Milestone 13: AdMob 🔒 (Blocked: production IDs needed)
-- [x] Add banner ads on Home/Tools/Recent only (Composables ready).
-- [x] Add interstitial after export success only (Logic ready).
-- [x] Add frequency cap: 1 interstitial every 2-3 exports, min 90s.
+## Milestone 13: AdMob 🚧
+- [x] Create `BannerAdView` dan test ad unit IDs.
+- [x] Mount banner test ads pada Home/Tools/Recent; Editor tetap bebas iklan.
+- [x] Create `InterstitialAdManager` dan frequency manager.
+- [ ] Wire load/show interstitial setelah export/tool success; saat ini baru action counter yang bertambah.
+- [x] Define frequency cap: 1 interstitial every 3 successful actions, min 90s.
+- [x] Add unit tests untuk enable flag, action threshold, cooldown, reset, dan record shown.
 - [x] No app open ad.
 - [x] No rewarded ad active in V1.
 - [x] Ads must not interrupt editing.
@@ -162,3 +167,15 @@ Dokumen ini adalah acuan utama (master plan) pengembangan aplikasi berdasarkan *
 - [x] **Fix Editor route SAF URI corruption**: Remove extra `Uri.decode()` in `AppNavigation`; Navigation Compose already decodes route arguments once.
 - [x] **Add SAF descriptor copy fallback**: `PdfRendererManager` now falls back from `openInputStream()` to `openFileDescriptor()` when copying a picked PDF to temp.
 - [x] Run GitHub Actions build for latest Editor route fix (local build intentionally skipped per user request; GitHub Actions run `27605133029` passed).
+
+## Milestone 16: Editor Usability & Ads Verification 🚧
+- [x] Audit ulang source editor, signature, replace text, dan ads pada 2026-06-23.
+- [x] Tambahkan resize gesture dengan minimum size dan aspect-ratio lock untuk `SignatureObject`.
+- [x] Hubungkan selection handle ke callback resize dan `UndoAction.ModifyObject`.
+- [ ] Tambahkan edit dialog untuk `TextObject` terpilih dengan nilai awal text/font/color/bold.
+- [ ] Selesaikan edit/resize replacement text setelah flow draw cover -> input -> place aktif.
+- [x] Tambahkan unit test `AdFrequencyManager` dengan clock yang bisa dikontrol agar cooldown deterministic.
+- [x] Pasang banner test ad yang terlihat jelas pada Home, Tools, dan Recent tanpa masuk ke Editor.
+- [ ] Hubungkan interstitial test ad hanya setelah aksi sukses dan lolos frequency cap.
+- [x] Jalankan `testDebugUnitTest` dan `assembleDebug` setelah implementasi.
+- [ ] Jalankan release AAB/GitHub Actions setelah perubahan dipush.

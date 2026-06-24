@@ -215,7 +215,7 @@ fun EditorScreen(
                                     }
                                 },
                                 onCoverDraw = { start, end ->
-                                    viewModel.addCoverObject(
+                                    viewModel.onCoverAreaSelected(
                                         screenX = minOf(start.x, end.x),
                                         screenY = minOf(start.y, end.y),
                                         screenWidth = kotlin.math.abs(end.x - start.x),
@@ -228,6 +228,13 @@ fun EditorScreen(
                                 onObjectDrag = { id, x, y ->
                                     viewModel.moveObject(
                                         id, x, y,
+                                        canvasSize.width.toFloat(),
+                                        canvasSize.height.toFloat()
+                                    )
+                                },
+                                onObjectResize = { id, width, height ->
+                                    viewModel.resizeSignatureObject(
+                                        id, width, height,
                                         canvasSize.width.toFloat(),
                                         canvasSize.height.toFloat()
                                     )
@@ -318,6 +325,7 @@ private fun PdfCanvasWithOverlays(
     onCoverDraw: (Offset, Offset) -> Unit,
     onObjectTap: (String) -> Unit,
     onObjectDrag: (String, Float, Float) -> Unit,
+    onObjectResize: (String, Float, Float) -> Unit,
     viewModel: EditorViewModel
 ) {
     var coverStart by remember { mutableStateOf<Offset?>(null) }
@@ -363,7 +371,7 @@ private fun PdfCanvasWithOverlays(
                     }
                 }
                 .pointerInput(state.activeTool) {
-                    if (state.activeTool != EditorTool.COVER) {
+                    if (state.activeTool != EditorTool.COVER && state.activeTool != EditorTool.REPLACE) {
                         detectTapGestures { offset ->
                             onCanvasTap(offset)
                         }
@@ -416,7 +424,8 @@ private fun PdfCanvasWithOverlays(
                         pdfPageWidth = pdfW,
                         pdfPageHeight = pdfH,
                         onTap = { onObjectTap(obj.id) },
-                        onDrag = { x, y -> onObjectDrag(obj.id, x, y) }
+                        onDrag = { x, y -> onObjectDrag(obj.id, x, y) },
+                        onResize = { width, height -> onObjectResize(obj.id, width, height) }
                     )
                 }
             }

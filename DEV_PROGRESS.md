@@ -1,13 +1,22 @@
 # DEV_PROGRESS.md — Edit PDF Online - Text Editor
-> Terakhir diperbarui: 2026-06-16 (siklus 2)
+> Terakhir diperbarui: 2026-06-23 (audit editor, signature, dan ads)
 
 ---
 
 ## Active Task
 
-Perbaikan Alat Utama (Main Tools) tidak mengaktifkan tool yang sesuai saat editor dibuka, dan peningkatan kualitas PDF preview.
+Penyempurnaan editor overlay: resize tanda tangan, edit text object yang sudah ditempatkan, penyelesaian Replace Text, dan integrasi serta unit test AdMob.
 
 ## Current Status
+
+- **Implementasi 2026-06-23**: mapping Alat Utama Edit Teks diubah dari `COVER` menjadi `REPLACE` pada Home dan Tools.
+- **Signature**: create/save/place/export/move/delete/resize aktif. Handle kanan bawah menjaga aspect ratio, minimum size, dan mencatat `UndoAction.ModifyObject`.
+- **Text**: tambah text baru, font size/color/bold saat pembuatan, move, delete, dan export tersedia. Dialog belum dapat membuka serta mengubah `TextObject` yang sudah dipilih.
+- **Replace Text**: draw area sekarang membuat cover, membuka dialog teks baru, dan menempatkan text pada titik kiri atas area pilihan. Edit ulang object terpilih masih pending.
+- **Undo/redo**: model `UndoAction.ModifyObject` tersedia, namun move/resize/edit belum mendorong modify action ke undo stack.
+- **Ads**: banner test ad aktif pada Home, Tools, dan Recent; Editor tetap tanpa ads. Interstitial masih belum di-load/show dari flow sukses.
+- **Tests**: empat unit test `AdFrequencyManager` aktif dan lulus untuk threshold, cooldown, disabled config, dan reset.
+- **Validation**: `testDebugUnitTest` dan `assembleDebug` lulus pada salinan build 2026-06-23.
 
 - **Fix Alat Utama**: Root cause ditemukan — semua 4 card di `MainToolsGrid` memanggil `onOpenPdf` yang SAMA, dan route editor tidak membawa informasi tool yang dipilih.
   1. Route editor sekarang memiliki parameter opsional `tool`: `editor?uri={uri}&tool={tool}`.
@@ -73,18 +82,15 @@ Perbaikan Alat Utama (Main Tools) tidak mengaktifkan tool yang sesuai saat edito
 
 ## In Progress
 
-- Device QA menggunakan APK terbaru.
+- Edit selected `TextObject` dan resize text/cover/checkmark.
+- Integrasi load/show interstitial setelah aksi sukses.
 
 ## Next Exact Steps
 
-1. **Device QA**: Install APK terbaru dan test open PDF dari:
-   - Home hero button
-   - Main Tools grid
-   - Tools tab -> Edit Text / Sign / Fill Form / Add Text
-   - Recent files
-   - File dari Google Drive / Download / internal storage
-2. Test apakah PDF dengan DRM/restrictions bisa dibuka (tanpa preview, dengan page count).
-3. Test export tetap berfungsi untuk PDF yang dibuka via PdfBox fallback.
+1. Ubah `TextInputDialog` agar mendukung mode add/edit dan prefill selected `TextObject`.
+2. Generalisasi resize untuk Text/Cover/Checkmark bila dibutuhkan.
+3. Hubungkan load/show interstitial setelah aksi sukses dan lolos frequency cap.
+4. Jalankan release AAB/GitHub Actions dan device QA untuk Replace, Signature resize, banner, serta export.
 
 ## Files Modified (siklus 2 — 2026-06-16)
 

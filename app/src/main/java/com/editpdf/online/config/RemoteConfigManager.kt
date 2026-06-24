@@ -11,7 +11,9 @@ package com.editpdf.online.config
  * Manages Remote Config values for ad behavior and feature flags.
  * Uses local defaults until Firebase is configured.
  */
-class RemoteConfigManager {
+class RemoteConfigManager(
+    private val overrides: Map<String, Any> = emptyMap()
+) {
 
     // Default values matching specification
     private val defaults = mapOf(
@@ -57,10 +59,10 @@ class RemoteConfigManager {
     }
 
     fun getBoolean(key: String): Boolean =
-        defaults[key] as? Boolean ?: false
+        overrides[key] as? Boolean ?: defaults[key] as? Boolean ?: false
 
     fun getLong(key: String): Long =
-        defaults[key] as? Long ?: 0L
+        overrides[key] as? Long ?: defaults[key] as? Long ?: 0L
 
     fun getInt(key: String): Int =
         getLong(key).toInt()

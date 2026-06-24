@@ -8,6 +8,7 @@
 package com.editpdf.online.ui.editor
 
 import android.graphics.BitmapFactory
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -24,6 +25,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
@@ -58,7 +60,8 @@ fun EditorOverlayObject(
     pdfPageWidth: Float,
     pdfPageHeight: Float,
     onTap: () -> Unit,
-    onDrag: (Float, Float) -> Unit
+    onDrag: (Float, Float) -> Unit,
+    onResize: (Float, Float) -> Unit
 ) {
     val density = LocalDensity.current
 
@@ -96,7 +99,10 @@ fun EditorOverlayObject(
                 CoverOverlay(obj, viewWidth, viewHeight, pdfPageWidth, pdfPageHeight, isSelected)
             }
             is PdfEditObject.SignatureObject -> {
-                SignatureOverlay(obj, viewWidth, viewHeight, pdfPageWidth, pdfPageHeight, isSelected)
+                SignatureOverlay(
+                    obj, viewWidth, viewHeight, pdfPageWidth, pdfPageHeight,
+                    isSelected, onResize
+                )
             }
             is PdfEditObject.CheckmarkObject -> {
                 CheckmarkOverlay(obj, viewWidth, viewHeight, pdfPageWidth, pdfPageHeight, isSelected)
@@ -174,10 +180,16 @@ private fun SignatureOverlay(
     viewHeight: Float,
     pdfPageWidth: Float,
     pdfPageHeight: Float,
-    isSelected: Boolean
+    isSelected: Boolean,
+    onResize: (Float, Float) -> Unit
 ) {
     val screenWidth = PdfEditorEngine.pdfSizeToScreen(obj.width, viewWidth, pdfPageWidth)
     val screenHeight = PdfEditorEngine.pdfSizeToScreen(obj.height, viewHeight, pdfPageHeight)
+    val density = LocalDensity.current
+    val minWidthPx = with(density) { 48.dp.toPx() }
+    val aspectRatio = (screenWidth / screenHeight).takeIf { it.isFinite() && it > 0f } ?: 2.5f
+    var currentWidthPx by remember(obj.id, obj.width) { mutableFloatStateOf(screenWidth) }
+    var currentHeightPx by remember(obj.id, obj.height) { mutableFloatStateOf(screenHeight) }
 
     val selectionModifier = if (isSelected) {
         Modifier.border(1.5.dp, SelectionBorder)
@@ -193,18 +205,35 @@ private fun SignatureOverlay(
 
     Box(
         modifier = selectionModifier
-            .width(screenWidth.dp)
-            .height(screenHeight.dp)
+            .width(with(density) { currentWidthPx.toDp() })
+            .height(with(density) { currentHeightPx.toDp() })
     ) {
         bitmap?.let { bmp ->
-            Canvas(modifier = Modifier.fillMaxSize()) {
-                drawImage(bmp)
-            }
+            Image(
+                bitmap = bmp,
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Fit
+            )
         }
-    }
-
-    if (isSelected) {
-        SelectionHandles()
+        if (isSelected) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .offset(x = 8.dp, y = 8.dp)
+                    .size(20.dp)
+                    .background(HandleColor, CircleShape)
+                    .pointerInput(obj.id) {
+                        detectDragGestures(
+                            onDragEnd = { onResize(currentWidthPx, currentHeightPx) }
+                        ) { change, dragAmount ->
+                            change.consume()
+                            currentWidthPx = (currentWidthPx + dragAmount.x).coerceAtLeast(minWidthPx)
+                            currentHeightPx = currentWidthPx / aspectRatio
+                        }
+                    }
+            )
+        }
     }
 }
 

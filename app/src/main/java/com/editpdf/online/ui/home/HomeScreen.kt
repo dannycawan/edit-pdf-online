@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.editpdf.online.R
+import com.editpdf.online.ads.BannerAdView
 import com.editpdf.online.data.model.RecentFile
 import com.editpdf.online.ui.theme.*
 import com.editpdf.online.utils.FileUtils
@@ -57,12 +58,15 @@ fun HomeScreen(
 
     Scaffold(
         bottomBar = {
-            BottomNavBar(
-                onHomeClick = { /* Already on home */ },
-                onFilesClick = onNavigateToRecent,
-                onToolsClick = onNavigateToTools,
-                onSettingsClick = onNavigateToSettings
-            )
+            Column {
+                BannerAdView()
+                BottomNavBar(
+                    onHomeClick = { /* Already on home */ },
+                    onFilesClick = onNavigateToRecent,
+                    onToolsClick = onNavigateToTools,
+                    onSettingsClick = onNavigateToSettings
+                )
+            }
         }
     ) { paddingValues ->
         Column(
@@ -81,7 +85,7 @@ fun HomeScreen(
             SectionHeader(title = stringResource(R.string.main_tools))
             Spacer(modifier = Modifier.height(12.dp))
             MainToolsGrid(
-                onEditTextClick = { onOpenPdfWithTool("COVER") },
+                onEditTextClick = { onOpenPdfWithTool("REPLACE") },
                 onSignClick = { onOpenPdfWithTool("SIGN") },
                 onFillFormClick = { onOpenPdfWithTool("CHECKMARK") },
                 onAddTextClick = { onOpenPdfWithTool("TEXT") }

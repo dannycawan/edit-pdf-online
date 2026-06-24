@@ -29,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.editpdf.online.R
+import com.editpdf.online.ads.BannerAdView
 import com.editpdf.online.data.model.RecentFile
 import com.editpdf.online.ui.home.HomeViewModel
 import com.editpdf.online.ui.theme.*
@@ -82,7 +83,8 @@ fun RecentFilesScreen(
                     containerColor = PrimaryNavy
                 )
             )
-        }
+        },
+        bottomBar = { BannerAdView() }
     ) { paddingValues ->
         if (recentFiles.isEmpty()) {
             // Empty state

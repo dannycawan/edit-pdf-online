@@ -269,6 +269,28 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     /**
+     * Completes a cover selection. Replace mode continues directly to the
+     * text dialog and anchors the replacement text at the selected area.
+     */
+    fun onCoverAreaSelected(
+        screenX: Float,
+        screenY: Float,
+        screenWidth: Float,
+        screenHeight: Float,
+        viewWidth: Float,
+        viewHeight: Float
+    ) {
+        addCoverObject(screenX, screenY, screenWidth, screenHeight, viewWidth, viewHeight)
+        if (_state.value.activeTool == EditorTool.REPLACE) {
+            pendingTapX = screenX
+            pendingTapY = screenY
+            pendingViewWidth = viewWidth
+            pendingViewHeight = viewHeight
+            showTextInput(true)
+        }
+    }
+
+    /**
      * Adds a signature object at the given screen position.
      */
     fun addSignatureObject(
@@ -396,6 +418,41 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
             newEditObjects[page] = pageObjects
 
             state.copy(editObjects = newEditObjects)
+        }
+    }
+
+    /** Resizes a signature and records the change as one undoable action. */
+    fun resizeSignatureObject(
+        objectId: String,
+        newScreenWidth: Float,
+        newScreenHeight: Float,
+        viewWidth: Float,
+        viewHeight: Float
+    ) {
+        val pdfWidth = PdfEditorEngine.screenSizeToPdf(newScreenWidth, viewWidth, pdfPageWidth)
+        val pdfHeight = PdfEditorEngine.screenSizeToPdf(newScreenHeight, viewHeight, pdfPageHeight)
+
+        _state.update { state ->
+            val page = state.currentPage
+            val pageObjects = state.editObjects[page]?.toMutableList() ?: return@update state
+            val index = pageObjects.indexOfFirst { it.id == objectId }
+            if (index == -1) return@update state
+
+            val oldObject = pageObjects[index] as? PdfEditObject.SignatureObject ?: return@update state
+            val newObject = oldObject.copy(
+                width = pdfWidth.coerceAtLeast(24f),
+                height = pdfHeight.coerceAtLeast(12f)
+            )
+            if (oldObject == newObject) return@update state
+
+            pageObjects[index] = newObject
+            val newEditObjects = state.editObjects.toMutableMap()
+            newEditObjects[page] = pageObjects
+            state.copy(
+                editObjects = newEditObjects,
+                undoStack = state.undoStack + UndoAction.ModifyObject(oldObject, newObject),
+                redoStack = emptyList()
+            )
         }
     }
 

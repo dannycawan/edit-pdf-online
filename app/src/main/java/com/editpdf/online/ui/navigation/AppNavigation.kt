@@ -193,7 +193,7 @@ fun AppNavigation() {
                         "edit_text", "add_text", "sign", "fill_form" -> {
                             // Map UI tool IDs to EditorTool enum names
                             pendingToolId = when (toolId) {
-                                "edit_text" -> "COVER"    // Edit text = cover + replace workflow
+                                "edit_text" -> "REPLACE"
                                 "sign"      -> "SIGN"
                                 "fill_form" -> "CHECKMARK"
                                 "add_text"  -> "TEXT"

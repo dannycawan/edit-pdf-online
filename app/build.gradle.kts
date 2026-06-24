@@ -123,6 +123,8 @@ dependencies {
     // AdMob - enabled from start for banner/interstitial setup
     implementation(libs.play.services.ads)
 
+    testImplementation(libs.junit)
+
     // Firebase - uncomment when google-services.json is added
     // implementation(platform(libs.firebase.bom))
     // implementation(libs.firebase.analytics)

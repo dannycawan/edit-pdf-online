@@ -17,7 +17,8 @@ import com.editpdf.online.config.RemoteConfigManager
  * - Minimum M seconds between interstitials (default: 90)
  */
 class AdFrequencyManager(
-    private val remoteConfig: RemoteConfigManager
+    private val remoteConfig: RemoteConfigManager,
+    private val nowMillis: () -> Long = System::currentTimeMillis
 ) {
     private var actionCount = 0
     private var lastInterstitialTimestamp = 0L
@@ -36,7 +37,7 @@ class AdFrequencyManager(
      */
     fun recordInterstitialShown() {
         actionCount = 0
-        lastInterstitialTimestamp = System.currentTimeMillis()
+        lastInterstitialTimestamp = nowMillis()
     }
 
     /**
@@ -54,7 +55,7 @@ class AdFrequencyManager(
         if (actionCount < frequency) return false
 
         // Check minimum time between interstitials
-        val elapsed = (System.currentTimeMillis() - lastInterstitialTimestamp) / 1000
+        val elapsed = (nowMillis() - lastInterstitialTimestamp) / 1000
         if (elapsed < minSeconds) return false
 
         return true

@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.editpdf.online.R
+import com.editpdf.online.ads.BannerAdView
 import com.editpdf.online.ui.theme.*
 import com.editpdf.online.utils.ShareUtils
 
@@ -105,7 +106,8 @@ fun ToolsScreen(
                     containerColor = PrimaryNavy
                 )
             )
-        }
+        },
+        bottomBar = { BannerAdView() }
     ) { paddingValues ->
         Column(
             modifier = Modifier

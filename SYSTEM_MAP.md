@@ -1,5 +1,5 @@
 # SYSTEM_MAP.md — Edit PDF Online - Text Editor
-> Terakhir diperbarui: 2026-06-16
+> Terakhir diperbarui: 2026-06-23
 
 ---
 
@@ -20,6 +20,20 @@
   - **Image Loading**: Coil Compose
   - **Build**: Gradle Kotlin DSL + Version Catalog (`libs.versions.toml`)
 - **Pola arsitektur**: Single-Activity + Compose Navigation, pendekatan Clean Architecture ringan (data/domain/ui layers), tanpa DI framework (manual instantiation).
+
+## Audit Delta 2026-06-23
+
+- Semua `PdfEditObject` adalah overlay di atas halaman asli; aplikasi belum mengubah content stream text asli secara langsung.
+- `TextObject`: add/move/delete/export aktif. Edit dan resize object yang sudah ditempatkan belum terhubung.
+- `CoverObject`: draw/move/delete/export aktif. Resize handle belum interaktif.
+- `SignatureObject`: draw/save/place/move/delete/resize/export aktif; resize menjaga aspect ratio dan masuk undo/redo.
+- `CheckmarkObject`: add/move/delete/export aktif; resize belum tersedia.
+- `EditorOverlay.SelectionHandles()` saat ini hanya menggambar satu titik indikator dan tidak menerima input gesture.
+- `UndoAction.ModifyObject` sudah dimodelkan, tetapi flow move/resize/edit belum memasukkannya ke undo stack.
+- Tool `REPLACE` menggambar cover, membuka dialog input, lalu membuat replacement `TextObject` pada area pilihan.
+- `BannerAdView` dipasang pada Home/Tools/Recent; Editor tidak memuat banner.
+- `InterstitialAdManager` tersedia tetapi belum dipanggil untuk preload/show; flow sukses hanya menaikkan counter `AdFrequencyManager`.
+- Unit test `AdFrequencyManager` mencakup threshold, cooldown, disabled config, dan reset; instrumentation test belum ada.
 
 ---
 

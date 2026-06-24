@@ -21,6 +21,7 @@ firebaseBom = "33.7.0"
 playServicesAds = "23.6.0"
 coil = "2.7.0"
 coreKtx = "1.15.0"
+junit = "4.13.2"
 
 [libraries]
 # AndroidX Core
@@ -71,6 +72,7 @@ play-services-ads = { group = "com.google.android.gms", name = "play-services-ad
 
 # Image Loading
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
