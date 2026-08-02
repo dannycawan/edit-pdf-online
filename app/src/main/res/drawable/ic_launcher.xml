@@ -4,16 +4,34 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
+    <!-- Red background -->
     <path
-        android:fillColor="#1A237E"
+        android:fillColor="#E30613"
         android:pathData="M0,0h108v108h-108z" />
+    <!-- White document body -->
     <path
         android:fillColor="#FFFFFF"
         android:pathData="M29,18h38l12,12v60h-50z" />
+    <!-- Folded corner -->
     <path
-        android:fillColor="#E3F2FD"
+        android:fillColor="#F5B7B7"
         android:pathData="M67,18v12h12z" />
+    <!-- Letter P -->
     <path
-        android:fillColor="#1976D2"
-        android:pathData="M38,43h32v6h-32zM38,56h32v6h-32zM38,69h22v6h-22z" />
+        android:fillColor="#E30613"
+        android:pathData="M37,46 L37,66 L41,66 L41,58 L45,58 C48.5,58 51,55.5 51,52 C51,48.5 48.5,46 45,46 Z
+                          M41,50 L44.5,50 C46.5,50 47,51 47,52 C47,53 46.5,54 44.5,54 L41,54 Z" />
+    <!-- Letter D -->
+    <path
+        android:fillColor="#E30613"
+        android:pathData="M52,46 L52,66 L57,66 C61.5,66 64,62.5 64,56 C64,49.5 61.5,46 57,46 Z
+                          M56,50 L57,50 C59.5,50 60,52.5 60,56 C60,59.5 59.5,62 57,62 L56,62 Z" />
+    <!-- Letter F -->
+    <path
+        android:fillColor="#E30613"
+        android:pathData="M65,46 L65,66 L69,66 L69,58 L74,58 L74,54 L69,54 L69,50 L75,50 L75,46 Z" />
+    <!-- Underline accent -->
+    <path
+        android:fillColor="#E30613"
+        android:pathData="M37,70 L75,70 L75,72 L37,72 Z" />
 </vector>

@@ -1,11 +1,11 @@
 # DEV_PROGRESS.md — Edit PDF Online - Text Editor
-> Terakhir diperbarui: 2026-06-23 (audit editor, signature, dan ads)
+> Terakhir diperbarui: 2026-08-02 (Play Store readiness, icon merah + PDF, push ke GitHub, build APK + AAB)
 
 ---
 
 ## Active Task
 
-Penyempurnaan editor overlay: resize tanda tangan, edit text object yang sudah ditempatkan, penyelesaian Replace Text, dan integrasi serta unit test AdMob.
+Play Store readiness: pembuatan icon app merah + tulisan PDF, adaptive icon, mipmap assets, feature graphic, dan update dokumentasi.
 
 ## Current Status
 
@@ -79,6 +79,14 @@ Penyempurnaan editor overlay: resize tanda tangan, edit text object yang sudah d
 - [x] **Fix Alat Utama tidak mengaktifkan tool**: Route editor kini memiliki param `tool`; setiap tool card mengirim toolId berbeda; EditorScreen auto-select tool via `LaunchedEffect`.
 - [x] **Improve PDF Preview**: Background canvas hitam gelap seperti viewer profesional; render scale dinaikkan ke 2.5f.
 - [x] **Improve Editor UI**: PageNavigationBar dark theme; ToolButton selected state lebih jelas.
+- [x] **Play Store Icon**: Buat icon app baru warna merah (#E30613) dengan tulisan "PDF" di dokumen putih.
+- [x] **Adaptive Icon**: Buat `ic_launcher_foreground.xml` dan `ic_launcher_background.xml` untuk Android 8.0+.
+- [x] **Mipmap Assets**: Buat folder mipmap-mdpi sampai mipmap-xxxhdpi dengan ic_launcher dan ic_launcher_round PNG.
+- [x] **AndroidManifest Update**: Ubah icon dari `@drawable` ke `@mipmap/ic_launcher` dan `@mipmap/ic_launcher_round`.
+- [x] **Play Store Assets**: Generate hi-res icon 512x512 dan feature graphic 1024x500 di folder `store-assets/`.
+- [x] **Dokumentasi**: Update ketiga file .md (DEV_PROGRESS, MASTER_PLAN, SYSTEM_MAP) ke tanggal 2026-08-02.
+- [x] **GitHub Push**: Semua perubahan icon, adaptive icon, mipmap, store-assets, dan .md di-commit dan di-push ke `origin/main`.
+- [x] **GitHub Actions**: Build APK + AAB otomatis berjalan via workflow `android-build.yml` setelah push ke main.
 
 ## In Progress
 
@@ -91,6 +99,7 @@ Penyempurnaan editor overlay: resize tanda tangan, edit text object yang sudah d
 2. Generalisasi resize untuk Text/Cover/Checkmark bila dibutuhkan.
 3. Hubungkan load/show interstitial setelah aksi sukses dan lolos frequency cap.
 4. Jalankan release AAB/GitHub Actions dan device QA untuk Replace, Signature resize, banner, serta export.
+5. Upload ke Play Store Console dengan icon dan feature graphic yang sudah dibuat.
 
 ## Files Modified (siklus 2 — 2026-06-16)
 

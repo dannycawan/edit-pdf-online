@@ -1,5 +1,5 @@
 # SYSTEM_MAP.md — Edit PDF Online - Text Editor
-> Terakhir diperbarui: 2026-06-23
+> Terakhir diperbarui: 2026-08-02
 
 ---
 
@@ -129,6 +129,9 @@ Setelah export/action sukses
 
 ```
 edit pdf online/
+├── store-assets/                          # Play Store assets
+│   ├── ic_launcher-playstore.png          # Hi-res icon 512x512
+│   └── feature_graphic.png                # Feature graphic 1024x500
 ├── build.gradle.kts                       # Root build script
 ├── settings.gradle.kts                    # Project settings
 ├── gradle.properties                      # Gradle properties
@@ -140,6 +143,18 @@ edit pdf online/
 │   └── src/main/
 │       ├── AndroidManifest.xml            # App manifest
 │       ├── res/
+│       │   ├── drawable/
+│       │   │   ├── ic_launcher.xml         # Legacy vector icon (red + PDF)
+│       │   │   ├── ic_launcher_foreground.xml # Adaptive icon foreground
+│       │   │   └── ic_launcher_background.xml # Adaptive icon background (red)
+│       │   ├── mipmap-anydpi-v26/
+│       │   │   ├── ic_launcher.xml         # Adaptive icon definition
+│       │   │   └── ic_launcher_round.xml   # Adaptive icon round variant
+│       │   ├── mipmap-mdpi/               # 48x48 fallback PNGs
+│       │   ├── mipmap-hdpi/               # 72x72 fallback PNGs
+│       │   ├── mipmap-xhdpi/              # 96x96 fallback PNGs
+│       │   ├── mipmap-xxhdpi/             # 144x144 fallback PNGs
+│       │   ├── mipmap-xxxhdpi/            # 192x192 fallback PNGs
 │       │   ├── values/
 │       │   │   ├── strings.xml            # String resources (EN)
 │       │   │   ├── colors.xml             # XML color definitions
@@ -328,10 +343,12 @@ edit pdf online/
 
 ## Build & Release Status
 
-- **Remote utama**: `origin/main` pada commit `4ad9e75` (2026-06-16 siklus 2).
-- **GitHub Actions**: Build sedang berjalan untuk commit `4ad9e75` (fix Alat Utama + improve PDF preview).
-- **Perubahan siklus 2**: Route editor memiliki param `tool`; MainTools auto-select; PDF preview lebih tajam dan UI editor lebih premium.
-- **Fresh picker, SecurityException, dan Editor route URI fix**: Local `assembleDebug` tidak dijalankan untuk patch 2026-06-16 sesuai instruksi user; verifikasi dilakukan lewat GitHub Actions.
+- **Remote utama**: `origin/main`.
+- **Push terakhir (2026-08-02)**: Commit icon merah + mipmap + store-assets + .md update → push ke `origin/main`.
+- **GitHub Actions**: Workflow `android-build.yml` otomatis build APK (debug) + AAB (release) saat push ke main.
+- **Play Store Assets**: Icon merah (#E30613) + tulisan PDF sudah dibuat. Adaptive icon + mipmap fallback tersedia.
+- **AndroidManifest**: Icon merujuk `@mipmap/ic_launcher` dan `@mipmap/ic_launcher_round`.
+- **Store Assets**: `store-assets/ic_launcher-playstore.png` (512x512), `store-assets/feature_graphic.png` (1024x500).
 
 ---
 
@@ -343,5 +360,5 @@ edit pdf online/
 4. **Coil Compose** ada di dependency tapi belum digunakan (disiapkan untuk load signature PNG).
 5. **ProGuard rules** hanya komentar default — belum ada rules untuk PdfBox-Android atau AdMob.
 6. **Runtime QA PDF Tools** masih perlu dicoba di perangkat dengan PDF nyata untuk export quality, large PDF, dan file password-protected.
-7. **Launcher icon** saat ini memakai vector sederhana `@drawable/ic_launcher`; aset produksi final belum dibuat.
+7. **Launcher icon** sekarang memakai adaptive icon merah (#E30613) + tulisan "PDF", dengan mipmap fallback PNG untuk Android < 8.0. Aset Play Store (512x512 hi-res icon dan 1024x500 feature graphic) tersedia di `store-assets/`.
 8. **PdfBox rendering unavailable** — PdfBox-Android 2.0.27.0 tidak menyediakan API konversi `BufferedImage` ke `Bitmap` Android. Saat PdfBox fallback aktif, preview halaman tidak tampil, tetapi navigasi, page count, dan export tetap berfungsi.

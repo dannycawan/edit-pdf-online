@@ -1,5 +1,5 @@
 # MASTER_PLAN.md — Edit PDF Online - Text Editor
-> Terakhir diperbarui: 2026-06-23
+> Terakhir diperbarui: 2026-08-02
 
 Dokumen ini adalah acuan utama (master plan) pengembangan aplikasi berdasarkan **IMPLEMENTATION ORDER** dari spesifikasi produk. Centang checklist saat setiap sub-task selesai.
 
@@ -167,6 +167,11 @@ Dokumen ini adalah acuan utama (master plan) pengembangan aplikasi berdasarkan *
 - [x] **Fix Editor route SAF URI corruption**: Remove extra `Uri.decode()` in `AppNavigation`; Navigation Compose already decodes route arguments once.
 - [x] **Add SAF descriptor copy fallback**: `PdfRendererManager` now falls back from `openInputStream()` to `openFileDescriptor()` when copying a picked PDF to temp.
 - [x] Run GitHub Actions build for latest Editor route fix (local build intentionally skipped per user request; GitHub Actions run `27605133029` passed).
+- [x] **Play Store Icon**: Buat icon merah (#E30613) dengan tulisan "PDF" di dokumen putih — adaptive icon + mipmap fallback.
+- [x] **Play Store Assets**: Hi-res icon 512x512, feature graphic 1024x500 di `store-assets/`.
+- [x] **AndroidManifest**: `@mipmap/ic_launcher` + `@mipmap/ic_launcher_round`.
+- [x] **GitHub Push (2026-08-02)**: Commit + push semua perubahan icon, mipmap, store-assets, dan .md ke `origin/main`.
+- [x] **GitHub Actions Build**: APK + AAB otomatis build via `android-build.yml` setelah push ke main.
 
 ## Milestone 16: Editor Usability & Ads Verification 🚧
 - [x] Audit ulang source editor, signature, replace text, dan ads pada 2026-06-23.
@@ -178,4 +183,4 @@ Dokumen ini adalah acuan utama (master plan) pengembangan aplikasi berdasarkan *
 - [x] Pasang banner test ad yang terlihat jelas pada Home, Tools, dan Recent tanpa masuk ke Editor.
 - [ ] Hubungkan interstitial test ad hanya setelah aksi sukses dan lolos frequency cap.
 - [x] Jalankan `testDebugUnitTest` dan `assembleDebug` setelah implementasi.
-- [ ] Jalankan release AAB/GitHub Actions setelah perubahan dipush.
+- [x] Jalankan release AAB/GitHub Actions setelah perubahan dipush (push 2026-08-02, workflow `android-build.yml`).
