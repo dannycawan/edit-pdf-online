@@ -35,6 +35,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.editpdf.online.R
+import com.editpdf.online.ads.BannerAdType
+import com.editpdf.online.ads.BannerAdView
+import com.editpdf.online.config.RemoteConfigManager
 import com.editpdf.online.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,6 +46,7 @@ fun SettingsScreen(
     onNavigateBack: () -> Unit
 ) {
     val context = LocalContext.current
+    val remoteConfig = remember { RemoteConfigManager() }
     var activeDialog by remember { mutableStateOf<SettingsDialogType?>(null) }
 
     Scaffold(
@@ -68,6 +72,12 @@ fun SettingsScreen(
                     containerColor = PrimaryNavy
                 )
             )
+        },
+        bottomBar = {
+            BannerAdView(
+                adType = BannerAdType.SETTINGS,
+                enabled = remoteConfig.isBannerRecentEnabled
+            )
         }
     ) { paddingValues ->
         Column(
@@ -83,6 +93,15 @@ fun SettingsScreen(
             AppInfoCard()
 
             Spacer(modifier = Modifier.height(24.dp))
+
+            // Banner above "Umum" section (non-intrusive)
+            BannerAdView(
+                adType = BannerAdType.SETTINGS_GENERAL,
+                enabled = remoteConfig.isBannerSettingsGeneralEnabled,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             // General Section
             SettingsSectionHeader(stringResource(R.string.settings_general))
@@ -106,6 +125,15 @@ fun SettingsScreen(
                     onClick = { activeDialog = SettingsDialogType.THEME }
                 )
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Banner above "Dukungan" section (non-intrusive)
+            BannerAdView(
+                adType = BannerAdType.SETTINGS_SUPPORT,
+                enabled = remoteConfig.isBannerSettingsSupportEnabled,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -165,6 +193,15 @@ fun SettingsScreen(
                     onClick = { activeDialog = SettingsDialogType.HELP }
                 )
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Banner above "Legal" section (non-intrusive)
+            BannerAdView(
+                adType = BannerAdType.SETTINGS_LEGAL,
+                enabled = remoteConfig.isBannerSettingsLegalEnabled,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 

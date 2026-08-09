@@ -19,8 +19,17 @@ class RemoteConfigManager(
     private val defaults = mapOf(
         // Ads
         ADS_BANNER_HOME_ENABLED to true,
+        ADS_BANNER_HOME_MAIN_TOOLS_ENABLED to true,
+        ADS_BANNER_HOME_PDF_TOOLS_ENABLED to true,
+        ADS_BANNER_HOME_INLINE_ENABLED to true,
         ADS_BANNER_TOOLS_ENABLED to true,
+        ADS_BANNER_TOOLS_MAIN_TOOLS_BOTTOM_ENABLED to true,
+        ADS_BANNER_TOOLS_PDF_TOOLS_ENABLED to true,
+        ADS_BANNER_TOOLS_INLINE_ENABLED to true,
         ADS_BANNER_RECENT_ENABLED to true,
+        ADS_BANNER_SETTINGS_GENERAL_ENABLED to true,
+        ADS_BANNER_SETTINGS_SUPPORT_ENABLED to true,
+        ADS_BANNER_SETTINGS_LEGAL_ENABLED to true,
         ADS_INTERSTITIAL_AFTER_EXPORT_ENABLED to true,
         ADS_INTERSTITIAL_FREQUENCY to 3L,
         ADS_INTERSTITIAL_MIN_SECONDS to 90L,
@@ -70,8 +79,17 @@ class RemoteConfigManager(
     // ==================== Convenience Getters ====================
 
     val isBannerHomeEnabled: Boolean get() = getBoolean(ADS_BANNER_HOME_ENABLED)
+    val isBannerHomeMainToolsEnabled: Boolean get() = getBoolean(ADS_BANNER_HOME_MAIN_TOOLS_ENABLED)
+    val isBannerHomePdfToolsEnabled: Boolean get() = getBoolean(ADS_BANNER_HOME_PDF_TOOLS_ENABLED)
+    val isBannerHomeInlineEnabled: Boolean get() = getBoolean(ADS_BANNER_HOME_INLINE_ENABLED)
     val isBannerToolsEnabled: Boolean get() = getBoolean(ADS_BANNER_TOOLS_ENABLED)
+    val isBannerToolsMainToolsBottomEnabled: Boolean get() = getBoolean(ADS_BANNER_TOOLS_MAIN_TOOLS_BOTTOM_ENABLED)
+    val isBannerToolsPdfToolsEnabled: Boolean get() = getBoolean(ADS_BANNER_TOOLS_PDF_TOOLS_ENABLED)
+    val isBannerToolsInlineEnabled: Boolean get() = getBoolean(ADS_BANNER_TOOLS_INLINE_ENABLED)
     val isBannerRecentEnabled: Boolean get() = getBoolean(ADS_BANNER_RECENT_ENABLED)
+    val isBannerSettingsGeneralEnabled: Boolean get() = getBoolean(ADS_BANNER_SETTINGS_GENERAL_ENABLED)
+    val isBannerSettingsSupportEnabled: Boolean get() = getBoolean(ADS_BANNER_SETTINGS_SUPPORT_ENABLED)
+    val isBannerSettingsLegalEnabled: Boolean get() = getBoolean(ADS_BANNER_SETTINGS_LEGAL_ENABLED)
     val isInterstitialAfterExportEnabled: Boolean get() = getBoolean(ADS_INTERSTITIAL_AFTER_EXPORT_ENABLED)
     val interstitialFrequency: Int get() = getInt(ADS_INTERSTITIAL_FREQUENCY)
     val interstitialMinSeconds: Int get() = getInt(ADS_INTERSTITIAL_MIN_SECONDS)
@@ -87,8 +105,17 @@ class RemoteConfigManager(
 
     companion object {
         const val ADS_BANNER_HOME_ENABLED = "ads_banner_home_enabled"
+        const val ADS_BANNER_HOME_MAIN_TOOLS_ENABLED = "ads_banner_home_main_tools_enabled"
+        const val ADS_BANNER_HOME_PDF_TOOLS_ENABLED = "ads_banner_home_pdf_tools_enabled"
+        const val ADS_BANNER_HOME_INLINE_ENABLED = "ads_banner_home_inline_enabled"
         const val ADS_BANNER_TOOLS_ENABLED = "ads_banner_tools_enabled"
+        const val ADS_BANNER_TOOLS_MAIN_TOOLS_BOTTOM_ENABLED = "ads_banner_tools_main_tools_bottom_enabled"
+        const val ADS_BANNER_TOOLS_PDF_TOOLS_ENABLED = "ads_banner_tools_pdf_tools_enabled"
+        const val ADS_BANNER_TOOLS_INLINE_ENABLED = "ads_banner_tools_inline_enabled"
         const val ADS_BANNER_RECENT_ENABLED = "ads_banner_recent_enabled"
+        const val ADS_BANNER_SETTINGS_GENERAL_ENABLED = "ads_banner_settings_general_enabled"
+        const val ADS_BANNER_SETTINGS_SUPPORT_ENABLED = "ads_banner_settings_support_enabled"
+        const val ADS_BANNER_SETTINGS_LEGAL_ENABLED = "ads_banner_settings_legal_enabled"
         const val ADS_INTERSTITIAL_AFTER_EXPORT_ENABLED = "ads_interstitial_after_export_enabled"
         const val ADS_INTERSTITIAL_FREQUENCY = "ads_interstitial_frequency"
         const val ADS_INTERSTITIAL_MIN_SECONDS = "ads_interstitial_min_seconds"

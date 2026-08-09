@@ -22,6 +22,7 @@ import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,7 +36,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.editpdf.online.R
+import com.editpdf.online.ads.BannerAdType
 import com.editpdf.online.ads.BannerAdView
+import com.editpdf.online.config.RemoteConfigManager
 import com.editpdf.online.data.model.RecentFile
 import com.editpdf.online.ui.theme.*
 import com.editpdf.online.utils.FileUtils
@@ -55,11 +58,15 @@ fun HomeScreen(
     homeViewModel: HomeViewModel = viewModel()
 ) {
     val recentFiles by homeViewModel.recentFiles.collectAsStateWithLifecycle()
+    val remoteConfig = remember { RemoteConfigManager() }
 
     Scaffold(
         bottomBar = {
             Column {
-                BannerAdView()
+                BannerAdView(
+                    adType = BannerAdType.HOME,
+                    enabled = remoteConfig.isBannerHomeEnabled
+                )
                 BottomNavBar(
                     onHomeClick = { /* Already on home */ },
                     onFilesClick = onNavigateToRecent,
@@ -81,6 +88,15 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
+            // Banner above "Alat Utama" section (non-intrusive)
+            BannerAdView(
+                adType = BannerAdType.HOME_MAIN_TOOLS,
+                enabled = remoteConfig.isBannerHomeMainToolsEnabled,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             // Main Tools
             SectionHeader(title = stringResource(R.string.main_tools))
             Spacer(modifier = Modifier.height(12.dp))
@@ -93,10 +109,28 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
+            // Banner above "Alat PDF" section (non-intrusive)
+            BannerAdView(
+                adType = BannerAdType.HOME_PDF_TOOLS,
+                enabled = remoteConfig.isBannerHomePdfToolsEnabled,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             // PDF Tools
             SectionHeader(title = stringResource(R.string.pdf_tools))
             Spacer(modifier = Modifier.height(12.dp))
             PdfToolsGrid(onToolClick = { onNavigateToTools() })
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Inline banner ad between sections (non-intrusive)
+            BannerAdView(
+                adType = BannerAdType.HOME_INLINE,
+                enabled = remoteConfig.isBannerHomeInlineEnabled,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
 
             Spacer(modifier = Modifier.height(24.dp))
 

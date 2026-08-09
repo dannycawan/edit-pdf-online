@@ -7,6 +7,7 @@
  */
 package com.editpdf.online.ui.tools
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -39,7 +40,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.editpdf.online.R
+import com.editpdf.online.ads.BannerAdType
 import com.editpdf.online.ads.BannerAdView
+import com.editpdf.online.config.RemoteConfigManager
 import com.editpdf.online.ui.theme.*
 import com.editpdf.online.utils.ShareUtils
 
@@ -51,7 +54,10 @@ fun ToolsScreen(
     viewModel: ToolsViewModel = viewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val shouldShowInterstitial by viewModel.shouldShowInterstitial.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val activity = context as? Activity
+    val remoteConfig = remember { RemoteConfigManager() }
     var pendingTool by remember { mutableStateOf<String?>(null) }
 
     val mergePicker = rememberLauncherForActivityResult(
@@ -107,7 +113,12 @@ fun ToolsScreen(
                 )
             )
         },
-        bottomBar = { BannerAdView() }
+        bottomBar = {
+            BannerAdView(
+                adType = BannerAdType.TOOLS,
+                enabled = remoteConfig.isBannerToolsEnabled
+            )
+        }
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -125,6 +136,24 @@ fun ToolsScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
+            // Banner below "Alat Utama" section (non-intrusive)
+            BannerAdView(
+                adType = BannerAdType.TOOLS_MAIN_TOOLS_BOTTOM,
+                enabled = remoteConfig.isBannerToolsMainToolsBottomEnabled,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Banner above "Alat PDF" section (non-intrusive)
+            BannerAdView(
+                adType = BannerAdType.TOOLS_PDF_TOOLS,
+                enabled = remoteConfig.isBannerToolsPdfToolsEnabled,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             // PDF Tools Section
             ToolSectionHeader(title = stringResource(R.string.pdf_tools))
             Spacer(modifier = Modifier.height(12.dp))
@@ -138,6 +167,15 @@ fun ToolsScreen(
                         }
                     }
                 }
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Inline banner ad between sections (non-intrusive)
+            BannerAdView(
+                adType = BannerAdType.TOOLS_INLINE,
+                enabled = remoteConfig.isBannerToolsInlineEnabled,
+                modifier = Modifier.padding(horizontal = 16.dp)
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -158,6 +196,14 @@ fun ToolsScreen(
             )
 
             Spacer(modifier = Modifier.height(32.dp))
+        }
+    }
+
+    // Show interstitial ad after successful tool completion (frequency cap handled by ViewModel)
+    LaunchedEffect(shouldShowInterstitial) {
+        if (shouldShowInterstitial && activity != null) {
+            viewModel.showInterstitialAd(activity)
+            viewModel.consumeInterstitialRequest()
         }
     }
 

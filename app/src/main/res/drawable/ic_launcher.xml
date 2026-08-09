@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  Purpose: Legacy vector icon for pre-Android 8.0 devices
+  Caller: AndroidManifest.xml (fallback when adaptive icon is not supported)
+  Design: Red background with white PDF document + bold "PDF" text, centered
+-->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
@@ -8,30 +13,41 @@
     <path
         android:fillColor="#E30613"
         android:pathData="M0,0h108v108h-108z" />
-    <!-- White document body -->
+    <!-- White document body - professional portrait card, centered at x=54, y=54 -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M29,18h38l12,12v60h-50z" />
-    <!-- Folded corner -->
+        android:pathData="M32,16 L64,16 L76,28 L76,92 L32,92 Z" />
+    <!-- Folded corner (dark red for depth) -->
     <path
-        android:fillColor="#F5B7B7"
-        android:pathData="M67,18v12h12z" />
-    <!-- Letter P -->
+        android:fillColor="#C4050F"
+        android:pathData="M64,16 L64,28 L76,28 Z" />
+    <!-- Folded corner highlight -->
     <path
-        android:fillColor="#E30613"
-        android:pathData="M37,46 L37,66 L41,66 L41,58 L45,58 C48.5,58 51,55.5 51,52 C51,48.5 48.5,46 45,46 Z
-                          M41,50 L44.5,50 C46.5,50 47,51 47,52 C47,53 46.5,54 44.5,54 L41,54 Z" />
-    <!-- Letter D -->
-    <path
-        android:fillColor="#E30613"
-        android:pathData="M52,46 L52,66 L57,66 C61.5,66 64,62.5 64,56 C64,49.5 61.5,46 57,46 Z
-                          M56,50 L57,50 C59.5,50 60,52.5 60,56 C60,59.5 59.5,62 57,62 L56,62 Z" />
-    <!-- Letter F -->
+        android:fillColor="#F09090"
+        android:pathData="M65,17 L65,27 L75,27 Z" />
+    <!-- Letter P (smaller, bold, centered) -->
     <path
         android:fillColor="#E30613"
-        android:pathData="M65,46 L65,66 L69,66 L69,58 L74,58 L74,54 L69,54 L69,50 L75,50 L75,46 Z" />
+        android:pathData="M36,44 L36,64 L39.6,64 L39.6,57.5 L43,57.5 C46,57.5 48,55.5 48,52.5 C48,49.5 46,44 43,44 Z
+                          M39.6,48.2 L42.6,48.2 C44.2,48.2 44.9,49 44.9,50.3 C44.9,51.6 44.2,52.4 42.6,52.4 L39.6,52.4 Z" />
+    <!-- Letter D (smaller, bold, centered) -->
+    <path
+        android:fillColor="#E30613"
+        android:pathData="M49.5,44 L49.5,64 L54,64 C58.5,64 61.4,61.2 61.4,54 C61.4,46.8 58.5,44 54,44 Z
+                          M53.2,48.2 L54,48.2 C56.2,48.2 57.4,49.9 57.4,54 C57.4,58.1 56.2,59.8 54,59.8 L53.2,59.8 Z" />
+    <!-- Letter F (smaller, bold, centered) -->
+    <path
+        android:fillColor="#E30613"
+        android:pathData="M63,44 L63,64 L67,64 L67,56.5 L71.4,56.5 L71.4,53.2 L67,53.2 L67,48.2 L72,48.2 L72,44 Z" />
     <!-- Underline accent -->
     <path
         android:fillColor="#E30613"
-        android:pathData="M37,70 L75,70 L75,72 L37,72 Z" />
+        android:pathData="M36,67 L72,67 L72,68.8 L36,68.8 Z" />
+    <!-- Subtle content lines (document body, light gray) -->
+    <path
+        android:fillColor="#D9D9D9"
+        android:pathData="M40,74 L68,74 L68,75.3 L40,75.3 Z" />
+    <path
+        android:fillColor="#D9D9D9"
+        android:pathData="M44,79 L64,79 L64,80.3 L44,80.3 Z" />
 </vector>

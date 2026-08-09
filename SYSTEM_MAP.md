@@ -1,5 +1,5 @@
 # SYSTEM_MAP.md — Edit PDF Online - Text Editor
-> Terakhir diperbarui: 2026-08-02
+> Terakhir diperbarui: 2026-08-02 (13 banner slots, redesign icon profesional, wire interstitial, adaptive banner + RemoteConfig, adType)
 
 ---
 
@@ -12,7 +12,7 @@
   - **PDF Engine**: PdfBox-Android (edit/export/merge/split), Android PdfRenderer (rendering preview)
   - **Database**: Room (SQLite) — entity `recent_files`
   - **Storage**: DataStore Preferences (belum digunakan aktif)
-  - **Ads**: Google AdMob (banner + interstitial)
+  - **Ads**: Google AdMob (adaptive banner + interstitial with frequency cap)
   - **Analytics**: Firebase Analytics (stub, belum aktif)
   - **Crash Reporting**: Firebase Crashlytics (stub, belum aktif)
   - **Remote Config**: Firebase Remote Config (stub, lokal defaults)
@@ -31,9 +31,10 @@
 - `EditorOverlay.SelectionHandles()` saat ini hanya menggambar satu titik indikator dan tidak menerima input gesture.
 - `UndoAction.ModifyObject` sudah dimodelkan, tetapi flow move/resize/edit belum memasukkannya ke undo stack.
 - Tool `REPLACE` menggambar cover, membuka dialog input, lalu membuat replacement `TextObject` pada area pilihan.
-- `BannerAdView` dipasang pada Home/Tools/Recent; Editor tidak memuat banner.
-- `InterstitialAdManager` tersedia tetapi belum dipanggil untuk preload/show; flow sukses hanya menaikkan counter `AdFrequencyManager`.
+- `BannerAdView` dipasang pada **13 slot** di Home (bottom, atas Alat Utama, atas Alat PDF, inline), Tools (bottom, bawah Alat Utama, atas Alat PDF, inline), Recent (bottom), Settings (bottom, atas Umum, atas Dukungan, atas Legal); Editor tetap bebas iklan. Setiap slot memakai `BannerAdType` unik dan flag `enabled` dari `RemoteConfigManager` agar bisa dimatikan remotely per slot.
+- `InterstitialAdManager` preload interstitial saat `EditorViewModel` dan `ToolsViewModel` init; show via UI layer (`LaunchedEffect`) setelah aksi sukses lolos frequency cap.
 - Unit test `AdFrequencyManager` mencakup threshold, cooldown, disabled config, dan reset; instrumentation test belum ada.
+- Icon launcher (adaptive foreground + legacy) di-redesign profesional: kartu dokumen portrait dengan folded corner, teks PDF lebih kecil & proporsional, garis konten halus, semua ter-center di x=54 dalam safe zone.
 
 ---
 
@@ -144,8 +145,8 @@ edit pdf online/
 │       ├── AndroidManifest.xml            # App manifest
 │       ├── res/
 │       │   ├── drawable/
-│       │   │   ├── ic_launcher.xml         # Legacy vector icon (red + PDF)
-│       │   │   ├── ic_launcher_foreground.xml # Adaptive icon foreground
+│       │   │   ├── ic_launcher.xml         # Legacy vector icon (red + PDF, centered)
+│       │   │   ├── ic_launcher_foreground.xml # Adaptive icon foreground (centered, enlarged)
 │       │   │   └── ic_launcher_background.xml # Adaptive icon background (red)
 │       │   ├── mipmap-anydpi-v26/
 │       │   │   ├── ic_launcher.xml         # Adaptive icon definition
@@ -261,8 +262,8 @@ edit pdf online/
 
 | File | Fungsi/Class Utama | Peran |
 |------|-------------------|-------|
-| `BannerAdView.kt` | `BannerAdView()` composable, `TEST_BANNER_AD_UNIT_ID`, `TEST_INTERSTITIAL_AD_UNIT_ID` | Banner ad wrapper untuk Compose via AndroidView |
-| `InterstitialAdManager.kt` | `loadInterstitial()`, `showInterstitialIfReady()` | Lifecycle load/show interstitial dengan frequency cap |
+| `BannerAdView.kt` | `BannerAdView()` composable, `BannerAdType` enum (13 nilai), `TEST_BANNER_AD_UNIT_ID`, `TEST_INTERSTITIAL_AD_UNIT_ID` | Adaptive banner ad wrapper untuk Compose via AndroidView; ukuran otomatis berdasarkan lebar layar; `adType` untuk identifikasi slot & `enabled` dari RemoteConfig untuk kontrol remote |
+| `InterstitialAdManager.kt` | `loadInterstitial()`, `showInterstitialIfReady()` | Lifecycle load/show interstitial dengan frequency cap; preload saat ViewModel init |
 | `AdFrequencyManager.kt` | `canShowInterstitial()`, `recordSuccessfulAction()`, `recordInterstitialShown()` | Frequency cap: setiap N aksi + minimum M detik antar interstitial |
 
 ### Config & Analytics
@@ -331,8 +332,8 @@ edit pdf online/
 
 | Service | Modul Pemanggil | Status |
 |---------|----------------|--------|
-| Google AdMob (Banner) | `BannerAdView.kt` | Aktif (test IDs) |
-| Google AdMob (Interstitial) | `InterstitialAdManager.kt` | Aktif (test IDs) |
+| Google AdMob (Banner) | `BannerAdView.kt` | Aktif (test IDs, adaptive banner) |
+| Google AdMob (Interstitial) | `InterstitialAdManager.kt` | Aktif (test IDs, preload+show wired) |
 | Firebase Analytics | `AnalyticsTracker.kt` | Stub (log ke Logcat) |
 | Firebase Crashlytics | `CrashReporter.kt` | Stub (log ke Logcat) |
 | Firebase Remote Config | `RemoteConfigManager.kt` | Stub (local defaults) |
@@ -344,9 +345,10 @@ edit pdf online/
 ## Build & Release Status
 
 - **Remote utama**: `origin/main`.
-- **Push terakhir (2026-08-02)**: Commit icon merah + mipmap + store-assets + .md update → push ke `origin/main`.
+- **Push terakhir (2026-08-02)**: Commit icon fix (center+enlarge), wire interstitial, adaptive banner, settings banner → push ke `origin/main`.
+- **Perubahan terbaru (working tree)**: Icon di-redesign profesional (teks PDF lebih kecil, kartu portrait, garis konten halus), `BannerAdView` ditambah `BannerAdType` (13 slot) + `enabled` (RemoteConfig) di semua slot banner (bottom + inline + section breaks).
 - **GitHub Actions**: Workflow `android-build.yml` otomatis build APK (debug) + AAB (release) saat push ke main.
-- **Play Store Assets**: Icon merah (#E30613) + tulisan PDF sudah dibuat. Adaptive icon + mipmap fallback tersedia.
+- **Play Store Assets**: Icon merah (#E30613) + tulisan PDF di dokumen putih, centered & enlarged. Adaptive icon + mipmap fallback tersedia.
 - **AndroidManifest**: Icon merujuk `@mipmap/ic_launcher` dan `@mipmap/ic_launcher_round`.
 - **Store Assets**: `store-assets/ic_launcher-playstore.png` (512x512), `store-assets/feature_graphic.png` (1024x500).
 
@@ -360,5 +362,5 @@ edit pdf online/
 4. **Coil Compose** ada di dependency tapi belum digunakan (disiapkan untuk load signature PNG).
 5. **ProGuard rules** hanya komentar default — belum ada rules untuk PdfBox-Android atau AdMob.
 6. **Runtime QA PDF Tools** masih perlu dicoba di perangkat dengan PDF nyata untuk export quality, large PDF, dan file password-protected.
-7. **Launcher icon** sekarang memakai adaptive icon merah (#E30613) + tulisan "PDF", dengan mipmap fallback PNG untuk Android < 8.0. Aset Play Store (512x512 hi-res icon dan 1024x500 feature graphic) tersedia di `store-assets/`.
+7. **Launcher icon** sekarang memakai adaptive icon merah (#E30613) + tulisan "PDF" yang di-center dan diperbesar dalam safe zone, dengan mipmap fallback PNG untuk Android < 8.0. Aset Play Store (512x512 hi-res icon dan 1024x500 feature graphic) tersedia di `store-assets/`.
 8. **PdfBox rendering unavailable** — PdfBox-Android 2.0.27.0 tidak menyediakan API konversi `BufferedImage` ke `Bitmap` Android. Saat PdfBox fallback aktif, preview halaman tidak tampil, tetapi navigasi, page count, dan export tetap berfungsi.

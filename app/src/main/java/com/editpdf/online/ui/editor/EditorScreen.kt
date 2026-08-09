@@ -7,6 +7,7 @@
  */
 package com.editpdf.online.ui.editor
 
+import android.app.Activity
 import android.graphics.Bitmap
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -63,7 +64,9 @@ fun EditorScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val pageBitmap by viewModel.pageBitmap.collectAsStateWithLifecycle()
+    val shouldShowInterstitial by viewModel.shouldShowInterstitial.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val activity = context as? Activity
 
     // Load PDF on first composition
     LaunchedEffect(uriString) {
@@ -87,6 +90,14 @@ fun EditorScreen(
         if (signatureImagePath.isNotBlank()) {
             viewModel.placeSignatureAtPendingTap(signatureImagePath)
             onSignatureImagePathConsumed()
+        }
+    }
+
+    // Show interstitial ad after successful export (frequency cap handled by ViewModel)
+    LaunchedEffect(shouldShowInterstitial) {
+        if (shouldShowInterstitial && activity != null) {
+            viewModel.showInterstitialAd(activity)
+            viewModel.consumeInterstitialRequest()
         }
     }
 

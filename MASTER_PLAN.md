@@ -1,5 +1,5 @@
 # MASTER_PLAN.md — Edit PDF Online - Text Editor
-> Terakhir diperbarui: 2026-08-02
+> Terakhir diperbarui: 2026-08-02 (13 banner slots, redesign icon profesional, optimize ads, wire interstitial, BannerAdType + RemoteConfig)
 
 Dokumen ini adalah acuan utama (master plan) pengembangan aplikasi berdasarkan **IMPLEMENTATION ORDER** dari spesifikasi produk. Centang checklist saat setiap sub-task selesai.
 
@@ -118,9 +118,12 @@ Dokumen ini adalah acuan utama (master plan) pengembangan aplikasi berdasarkan *
 
 ## Milestone 13: AdMob 🚧
 - [x] Create `BannerAdView` dan test ad unit IDs.
-- [x] Mount banner test ads pada Home/Tools/Recent; Editor tetap bebas iklan.
+- [x] Mount banner test ads pada Home/Tools/Recent/Settings; Editor tetap bebas iklan.
 - [x] Create `InterstitialAdManager` dan frequency manager.
-- [ ] Wire load/show interstitial setelah export/tool success; saat ini baru action counter yang bertambah.
+- [x] Wire load/show interstitial setelah export/tool success; preload saat ViewModel init, show via UI layer.
+- [x] Upgrade banner ke Adaptive Banner untuk revenue optimal.
+- [x] Tambah `BannerAdType` (13 nilai) + parameter `enabled` dari `RemoteConfigManager` di semua slot banner agar bisa dimatikan remotely.
+- [x] Tambah **13 slot banner**: Home (bottom, atas Alat Utama, atas Alat PDF, inline), Tools (bottom, bawah Alat Utama, atas Alat PDF, inline), Recent (bottom), Settings (bottom, atas Umum, atas Dukungan, atas Legal) — slot iklan tambahan tanpa mengganggu UX.
 - [x] Define frequency cap: 1 interstitial every 3 successful actions, min 90s.
 - [x] Add unit tests untuk enable flag, action threshold, cooldown, reset, dan record shown.
 - [x] No app open ad.
@@ -168,6 +171,8 @@ Dokumen ini adalah acuan utama (master plan) pengembangan aplikasi berdasarkan *
 - [x] **Add SAF descriptor copy fallback**: `PdfRendererManager` now falls back from `openInputStream()` to `openFileDescriptor()` when copying a picked PDF to temp.
 - [x] Run GitHub Actions build for latest Editor route fix (local build intentionally skipped per user request; GitHub Actions run `27605133029` passed).
 - [x] **Play Store Icon**: Buat icon merah (#E30613) dengan tulisan "PDF" di dokumen putih — adaptive icon + mipmap fallback.
+- [x] **Play Store Icon Fix**: Center ulang dan perbesar dokumen+teks PDF dalam adaptive icon safe zone, perbaiki folded corner contrast.
+- [x] **Icon Redesign Profesional**: Redesign icon launcher (foreground + legacy) — teks PDF lebih kecil & proporsional, kartu dokumen portrait, garis konten halus, center x=54.
 - [x] **Play Store Assets**: Hi-res icon 512x512, feature graphic 1024x500 di `store-assets/`.
 - [x] **AndroidManifest**: `@mipmap/ic_launcher` + `@mipmap/ic_launcher_round`.
 - [x] **GitHub Push (2026-08-02)**: Commit + push semua perubahan icon, mipmap, store-assets, dan .md ke `origin/main`.
@@ -180,7 +185,9 @@ Dokumen ini adalah acuan utama (master plan) pengembangan aplikasi berdasarkan *
 - [ ] Tambahkan edit dialog untuk `TextObject` terpilih dengan nilai awal text/font/color/bold.
 - [ ] Selesaikan edit/resize replacement text setelah flow draw cover -> input -> place aktif.
 - [x] Tambahkan unit test `AdFrequencyManager` dengan clock yang bisa dikontrol agar cooldown deterministic.
-- [x] Pasang banner test ad yang terlihat jelas pada Home, Tools, dan Recent tanpa masuk ke Editor.
-- [ ] Hubungkan interstitial test ad hanya setelah aksi sukses dan lolos frequency cap.
+- [x] Pasang banner test ad yang terlihat jelas pada Home, Tools, Recent, dan Settings tanpa masuk ke Editor.
+- [x] Hubungkan interstitial test ad setelah aksi sukses dan lolos frequency cap; preload saat ViewModel init.
+- [x] Upgrade banner ke Adaptive Banner (`getCurrentOrientationAnchoredAdaptiveBannerAdSize`).
+- [x] Tambah `BannerAdType` (13 nilai) + `enabled` (RemoteConfig) di `BannerAdView` dan semua slot banner (bottom + inline + section breaks).
 - [x] Jalankan `testDebugUnitTest` dan `assembleDebug` setelah implementasi.
 - [x] Jalankan release AAB/GitHub Actions setelah perubahan dipush (push 2026-08-02, workflow `android-build.yml`).

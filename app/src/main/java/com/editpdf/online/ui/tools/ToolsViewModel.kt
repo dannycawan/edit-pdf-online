@@ -7,12 +7,14 @@
  */
 package com.editpdf.online.ui.tools
 
+import android.app.Activity
 import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.editpdf.online.R
 import com.editpdf.online.ads.AdFrequencyManager
+import com.editpdf.online.ads.InterstitialAdManager
 import com.editpdf.online.analytics.AnalyticsTracker
 import com.editpdf.online.config.RemoteConfigManager
 import com.editpdf.online.pdf.PdfConversionManager
@@ -42,9 +44,19 @@ class ToolsViewModel(application: Application) : AndroidViewModel(application) {
     private val conversionManager = PdfConversionManager(context)
     private val analyticsTracker = AnalyticsTracker(context)
     private val adFrequencyManager = AdFrequencyManager(RemoteConfigManager())
+    private val interstitialAdManager = InterstitialAdManager(context, adFrequencyManager)
+
+    // Preload interstitial ad on ViewModel init
+    init {
+        interstitialAdManager.loadInterstitial()
+    }
 
     private val _uiState = MutableStateFlow(ToolsUiState())
     val uiState: StateFlow<ToolsUiState> = _uiState.asStateFlow()
+
+    // Interstitial ad trigger state — UI observes this to show ad
+    private val _shouldShowInterstitial = MutableStateFlow(false)
+    val shouldShowInterstitial: StateFlow<Boolean> = _shouldShowInterstitial.asStateFlow()
 
     fun prepareSinglePdfTool(toolId: String, uri: Uri) {
         _uiState.update {
@@ -154,6 +166,9 @@ class ToolsViewModel(application: Application) : AndroidViewModel(application) {
             result.fold(
                 onSuccess = { files ->
                     adFrequencyManager.recordSuccessfulAction()
+                    if (adFrequencyManager.canShowInterstitial()) {
+                        _shouldShowInterstitial.value = true
+                    }
                     analyticsTracker.trackToolSuccess(toolName)
                     _uiState.update {
                         it.copy(
@@ -206,4 +221,21 @@ class ToolsViewModel(application: Application) : AndroidViewModel(application) {
                 else -> trimmed.toIntOrNull()?.takeIf { it > 0 }?.let { page -> (page - 1)..(page - 1) }
             }
         }
+
+    /**
+     * Shows an interstitial ad if one is loaded and frequency cap allows it.
+     * Called from the UI layer which has access to the Activity.
+     */
+    fun showInterstitialAd(activity: Activity) {
+        interstitialAdManager.showInterstitialIfReady(activity) {
+            // Preload next ad after dismissal
+        }
+    }
+
+    /**
+     * Resets the interstitial trigger flag after UI has processed it.
+     */
+    fun consumeInterstitialRequest() {
+        _shouldShowInterstitial.value = false
+    }
 }

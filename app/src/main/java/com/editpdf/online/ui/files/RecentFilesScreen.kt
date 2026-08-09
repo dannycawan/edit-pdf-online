@@ -29,7 +29,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.editpdf.online.R
+import com.editpdf.online.ads.BannerAdType
 import com.editpdf.online.ads.BannerAdView
+import com.editpdf.online.config.RemoteConfigManager
 import com.editpdf.online.data.model.RecentFile
 import com.editpdf.online.ui.home.HomeViewModel
 import com.editpdf.online.ui.theme.*
@@ -47,6 +49,7 @@ fun RecentFilesScreen(
     viewModel: HomeViewModel
 ) {
     val recentFiles by viewModel.recentFiles.collectAsStateWithLifecycle()
+    val remoteConfig = remember { RemoteConfigManager() }
     var showClearDialog by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -84,7 +87,12 @@ fun RecentFilesScreen(
                 )
             )
         },
-        bottomBar = { BannerAdView() }
+        bottomBar = {
+            BannerAdView(
+                adType = BannerAdType.RECENT,
+                enabled = remoteConfig.isBannerRecentEnabled
+            )
+        }
     ) { paddingValues ->
         if (recentFiles.isEmpty()) {
             // Empty state

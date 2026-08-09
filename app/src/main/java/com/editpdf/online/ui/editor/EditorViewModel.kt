@@ -7,6 +7,7 @@
  */
 package com.editpdf.online.ui.editor
 
+import android.app.Activity
 import android.app.Application
 import android.graphics.Bitmap
 import android.net.Uri
@@ -48,9 +49,18 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
     private val adFrequencyManager = AdFrequencyManager(RemoteConfigManager())
     private val interstitialAdManager = InterstitialAdManager(context, adFrequencyManager)
 
+    // Preload interstitial ad on ViewModel init
+    init {
+        interstitialAdManager.loadInterstitial()
+    }
+
     // State
     private val _state = MutableStateFlow(EditorState())
     val state: StateFlow<EditorState> = _state.asStateFlow()
+
+    // Interstitial ad trigger state — UI observes this to show ad
+    private val _shouldShowInterstitial = MutableStateFlow(false)
+    val shouldShowInterstitial: StateFlow<Boolean> = _shouldShowInterstitial.asStateFlow()
 
     // Current page bitmap
     private val _pageBitmap = MutableStateFlow<Bitmap?>(null)
@@ -638,8 +648,11 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
                     // Track analytics
                     analyticsTracker.trackExportSuccess(_state.value.totalPages)
 
-                    // Show interstitial ad with frequency cap
+                    // Record action and trigger interstitial ad with frequency cap
                     adFrequencyManager.recordSuccessfulAction()
+                    if (adFrequencyManager.canShowInterstitial()) {
+                        _shouldShowInterstitial.value = true
+                    }
 
                     _state.update {
                         it.copy(
@@ -691,6 +704,9 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
                     recentFileRepository.markAsExported(_state.value.pdfUri)
                     analyticsTracker.trackExportSuccess(_state.value.totalPages)
                     adFrequencyManager.recordSuccessfulAction()
+                    if (adFrequencyManager.canShowInterstitial()) {
+                        _shouldShowInterstitial.value = true
+                    }
                     _state.update {
                         it.copy(isExporting = false, exportSuccess = true, errorMessage = null)
                     }
@@ -758,6 +774,23 @@ class EditorViewModel(application: Application) : AndroidViewModel(application) 
      */
     fun onTextInputConfirm(text: String, fontSize: Float, color: Int, isBold: Boolean) {
         addTextObject(text, pendingTapX, pendingTapY, pendingViewWidth, pendingViewHeight, fontSize, color, isBold)
+    }
+
+    /**
+     * Shows an interstitial ad if one is loaded and frequency cap allows it.
+     * Called from the UI layer which has access to the Activity.
+     */
+    fun showInterstitialAd(activity: Activity) {
+        interstitialAdManager.showInterstitialIfReady(activity) {
+            // Preload next ad after dismissal
+        }
+    }
+
+    /**
+     * Resets the interstitial trigger flag after UI has processed it.
+     */
+    fun consumeInterstitialRequest() {
+        _shouldShowInterstitial.value = false
     }
 
     override fun onCleared() {

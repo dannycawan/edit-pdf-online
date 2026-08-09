@@ -1,11 +1,11 @@
 # DEV_PROGRESS.md — Edit PDF Online - Text Editor
-> Terakhir diperbarui: 2026-08-02 (Play Store readiness, icon merah + PDF, push ke GitHub, build APK + AAB)
+> Terakhir diperbarui: 2026-08-02 (13 banner slots, redesign icon profesional, wire interstitial ads, adaptive banner + RemoteConfig, adType)
 
 ---
 
 ## Active Task
 
-Play Store readiness: pembuatan icon app merah + tulisan PDF, adaptive icon, mipmap assets, feature graphic, dan update dokumentasi.
+Redesign icon logo profesional (teks PDF lebih kecil), wire interstitial ads (preload + show), upgrade banner ke adaptive, tambah banner di SettingsScreen, tambah `BannerAdType` + RemoteConfig control + inline banner di banyak slot.
 
 ## Current Status
 
@@ -14,7 +14,13 @@ Play Store readiness: pembuatan icon app merah + tulisan PDF, adaptive icon, mip
 - **Text**: tambah text baru, font size/color/bold saat pembuatan, move, delete, dan export tersedia. Dialog belum dapat membuka serta mengubah `TextObject` yang sudah dipilih.
 - **Replace Text**: draw area sekarang membuat cover, membuka dialog teks baru, dan menempatkan text pada titik kiri atas area pilihan. Edit ulang object terpilih masih pending.
 - **Undo/redo**: model `UndoAction.ModifyObject` tersedia, namun move/resize/edit belum mendorong modify action ke undo stack.
-- **Ads**: banner test ad aktif pada Home, Tools, dan Recent; Editor tetap tanpa ads. Interstitial masih belum di-load/show dari flow sukses.
+- **Ads Banner**: Upgrade dari fixed `BANNER` (320x50) ke **Adaptive Banner** (`getCurrentOrientationAnchoredAdaptiveBannerAdSize`) untuk revenue 2-3x lebih tinggi. Banner aktif di Home, Tools, Recent, dan Settings; Editor tetap tanpa ads.
+- **Ads Interstitial**: `InterstitialAdManager` sekarang di-preload saat `EditorViewModel` dan `ToolsViewModel` init. Setelah aksi sukses (export/tool), frequency cap dicek dan interstitial ditampilkan via UI layer (`LaunchedEffect`). Frequency cap: 1 interstitial setiap 3 aksi, minimum 90 detik.
+- **Icon Fix**: Adaptive icon foreground dan legacy icon di-center ulang dan diperbesar. Dokumen dan teks PDF sekarang mengisi safe zone lebih optimal. Folded corner memiliki kontras lebih baik.
+- **Icon Redesign Profesional**: Icon launcher (adaptive foreground + legacy) di-redesign: kartu dokumen portrait dengan folded corner, teks PDF lebih kecil & proporsional, garis konten halus, semua ter-center di x=54 dalam safe zone.
+- **BannerAdView Enhancement**: `BannerAdView` kini menerima `adType: BannerAdType` (HOME/HOME_INLINE/TOOLS/TOOLS_INLINE/RECENT/SETTINGS) dan `enabled: Boolean` dari `RemoteConfigManager` — banner bisa dimatikan remotely per slot.
+- **Inline Banner**: Tambah slot banner inline di Home (antara PDF Tools & Recent Files) dan Tools (antara PDF Tools & Convert Tools) — slot iklan tambahan tanpa mengganggu UX.
+- **13 Banner Slots**: Total **13 slot banner** tersebar di Home (bottom, atas Alat Utama, atas Alat PDF, inline), Tools (bottom, bawah Alat Utama, atas Alat PDF, inline), Recent (bottom), Settings (bottom, atas Umum, atas Dukungan, atas Legal) — semua dengan RemoteConfig individual, Editor tetap bebas iklan.
 - **Tests**: empat unit test `AdFrequencyManager` aktif dan lulus untuk threshold, cooldown, disabled config, dan reset.
 - **Validation**: `testDebugUnitTest` dan `assembleDebug` lulus pada salinan build 2026-06-23.
 
@@ -87,19 +93,28 @@ Play Store readiness: pembuatan icon app merah + tulisan PDF, adaptive icon, mip
 - [x] **Dokumentasi**: Update ketiga file .md (DEV_PROGRESS, MASTER_PLAN, SYSTEM_MAP) ke tanggal 2026-08-02.
 - [x] **GitHub Push**: Semua perubahan icon, adaptive icon, mipmap, store-assets, dan .md di-commit dan di-push ke `origin/main`.
 - [x] **GitHub Actions**: Build APK + AAB otomatis berjalan via workflow `android-build.yml` setelah push ke main.
+- [x] **Icon Fix**: Center ulang dan perbesar dokumen+teks PDF dalam adaptive icon safe zone (foreground + legacy).
+- [x] **Folded Corner**: Perbaiki kontras folded corner dari `#F5B7B7` ke `#C4050F` (dark red) + `#F09090` (highlight).
+- [x] **Wire Interstitial**: Preload interstitial di `EditorViewModel` dan `ToolsViewModel` init; show via UI layer setelah aksi sukses lolos frequency cap.
+- [x] **Adaptive Banner**: Upgrade `BannerAdView` dari `AdSize.BANNER` ke `getCurrentOrientationAnchoredAdaptiveBannerAdSize` untuk revenue optimal.
+- [x] **Settings Banner**: Tambah `BannerAdView` di `SettingsScreen` bottom bar — 1 slot iklan tambahan.
+- [x] **Icon Redesign Profesional**: Redesign icon launcher (foreground + legacy) — teks PDF lebih kecil, kartu portrait, garis konten halus, center x=54.
+- [x] **BannerAdType + RemoteConfig**: Tambah enum `BannerAdType` (termasuk HOME_INLINE/TOOLS_INLINE) dan parameter `enabled` di `BannerAdView`; semua slot banner pass flag dari `RemoteConfigManager`.
+- [x] **Inline Banner**: Tambah slot banner inline di Home dan Tools — slot iklan tambahan tanpa mengganggu UX.
+- [x] **13 Banner Slots**: Tambah 7 slot banner baru (Home atas Alat Utama + atas Alat PDF, Tools bawah Alat Utama + atas Alat PDF, Settings atas Umum + atas Dukungan + atas Legal) — total 13 slot.
+- [x] **Update .md**: Update MASTER_PLAN, DEV_PROGRESS, SYSTEM_MAP ke tanggal terbaru.
 
 ## In Progress
 
 - Edit selected `TextObject` dan resize text/cover/checkmark.
-- Integrasi load/show interstitial setelah aksi sukses.
 
 ## Next Exact Steps
 
 1. Ubah `TextInputDialog` agar mendukung mode add/edit dan prefill selected `TextObject`.
 2. Generalisasi resize untuk Text/Cover/Checkmark bila dibutuhkan.
-3. Hubungkan load/show interstitial setelah aksi sukses dan lolos frequency cap.
-4. Jalankan release AAB/GitHub Actions dan device QA untuk Replace, Signature resize, banner, serta export.
-5. Upload ke Play Store Console dengan icon dan feature graphic yang sudah dibuat.
+3. Jalankan release AAB/GitHub Actions dan device QA untuk interstitial, banner, icon, Replace, Signature resize, dan export.
+4. Upload ke Play Store Console dengan icon dan feature graphic yang sudah dibuat.
+5. Ganti test ad unit IDs ke production IDs setelah AdMob console siap.
 
 ## Files Modified (siklus 2 — 2026-06-16)
 
